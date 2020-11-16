@@ -1,4 +1,4 @@
-package club.pengubank
+package club.pengubank.application
 
 import io.ktor.locations.*
 
@@ -9,6 +9,16 @@ class Home
 @KtorExperimentalLocationsAPI
 @Location("/about")
 class About
+
+/* User Routes */
+
+@KtorExperimentalLocationsAPI
+@Location("/users")
+class UserList
+
+@KtorExperimentalLocationsAPI
+@Location("/users/{id}")
+data class UserGet(val id: Int)
 
 
 /*
