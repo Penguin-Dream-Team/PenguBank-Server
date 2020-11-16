@@ -1,7 +1,9 @@
 package club.pengubank.application
 
 import club.pengubank.errors.ErrorResponse
+import club.pengubank.errors.UnauthorizedException
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.http.*
@@ -50,6 +52,7 @@ fun Application.installFeatures() {
 
             val status = when (e) {
                 is EntityNotFoundException, is NotFoundException -> HttpStatusCode.NotFound
+                is UnauthorizedException -> HttpStatusCode.Unauthorized
                 else -> HttpStatusCode.InternalServerError
             }
 

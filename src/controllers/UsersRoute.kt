@@ -2,7 +2,6 @@ package club.pengubank.controllers
 
 import club.pengubank.application.UserGet
 import club.pengubank.application.UserList
-import club.pengubank.repositories.UserRepository
 import club.pengubank.services.UserService
 import io.ktor.application.*
 import io.ktor.locations.*
@@ -22,7 +21,6 @@ fun Route.users() {
 
     get<UserGet> { userGet ->
         val user = userService.getUserById(userGet.id)
-
         call.respond(user.toUser())
     }
 }

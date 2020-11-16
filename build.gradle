@@ -54,4 +54,6 @@ dependencies {
 
     implementation "com.zaxxer:HikariCP:3.4.5" // JDBC Connection Pool
     implementation "org.postgresql:postgresql:42.2.1" // JDBC Connector for PostgreSQL
+
+    implementation "org.springframework.security:spring-security-core:5.4.1" // BCrypt password encoder
 }

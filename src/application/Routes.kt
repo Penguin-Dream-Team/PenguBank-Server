@@ -20,6 +20,9 @@ class UserList
 @Location("/users/{id}")
 data class UserGet(val id: Int)
 
+@KtorExperimentalLocationsAPI
+@Location("/login/{email}/{password}")
+data class LoginUser(val email: String, val password: String)
 
 /*
     - Home => optional
