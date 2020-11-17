@@ -1,10 +1,10 @@
 package club.pengubank.repositories
 
+import club.pengubank.errors.exceptions.user.UserNotFoundException
+import club.pengubank.errors.exceptions.user.UserWrongEmailException
 import club.pengubank.models.User
 import club.pengubank.models.UserEntity
 import club.pengubank.models.Users
-import io.ktor.features.*
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
@@ -14,11 +14,11 @@ class UserRepository {
     }
 
     fun getUser(userId: Int) = transaction {
-        UserEntity[userId]
+        UserEntity.findById(userId) ?: throw UserNotFoundException(userId)
     }
 
     fun getUser(email: String) = transaction {
-        UserEntity.find { Users.email eq email }.firstOrNull() ?: throw NotFoundException("Entity UserEntity, email=$email not found in the database")
+        UserEntity.find { Users.email eq email }.firstOrNull() ?: throw UserWrongEmailException(email)
     }
 
     fun addUser(user: User) = transaction {
@@ -29,6 +29,7 @@ class UserRepository {
     }
 
     fun deleteUser(userId: Int) = transaction {
-        UserEntity[userId].delete()
+        val user = getUser(userId)
+        user.delete()
     }
 }
