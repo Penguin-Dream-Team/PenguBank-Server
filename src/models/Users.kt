@@ -26,12 +26,12 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
 
     override fun toString(): String = "User($id, $email, $password, $registeredAt)"
 
-    fun toUser() = User(id.value, email, password, registeredAt.toString())
-    fun toUserWithToken() = UserWithJWT(toUser())
+    fun toUserResponse() = UserResponse(id.value, email, registeredAt.toString())
+    fun toUserResponseWithToken() = UserResponseWithJWT(toUserResponse())
 }
 
 // JSON Object DTO
-data class User(
+data class UserReponse(
     val id: Int,
     val email: String,
     val password: String,
@@ -39,7 +39,14 @@ data class User(
 )
 
 // JSON Object DTO
-data class UserWithJWT(
-    val user: User,
-    val token: String = JWTAuthenticationConfig.makeToken(user)
+data class UserResponse(
+    val id: Int,
+    val email: String,
+    val registeredAt: String,
+)
+
+// JSON Object DTO
+data class UserResponseWithJWT(
+    val userResponse: UserResponse,
+    val token: String = JWTAuthenticationConfig.makeToken(userResponse)
 ) : Principal

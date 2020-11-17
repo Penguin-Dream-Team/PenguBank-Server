@@ -20,7 +20,7 @@ fun Route.login() {
         withContext(Dispatchers.IO) {
             val loginValues = call.receive<LoginRequest>()
             val loginResult = authService.login(loginValues.email, loginValues.password)
-            call.respond(loginResult.toUserWithToken())
+            call.respond(loginResult.toUserResponseWithToken())
         }
     }
 }

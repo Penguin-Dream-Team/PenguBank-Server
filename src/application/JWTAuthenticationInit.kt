@@ -1,7 +1,7 @@
 package club.pengubank.application
 
-import club.pengubank.models.User
-import club.pengubank.models.UserWithJWT
+import club.pengubank.models.UserResponse
+import club.pengubank.models.UserResponseWithJWT
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
@@ -21,14 +21,14 @@ object JWTAuthenticationConfig {
         .withIssuer(issuer)
         .build()
 
-    fun makeToken(user: User): String = JWT.create()
+    fun makeToken(userRequest: UserResponse): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
-        .withClaim("id", user.id)
+        .withClaim("id", userRequest.id)
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 
     private fun getExpiration() = Date(System.currentTimeMillis() + validityInMs)
 }
 
-val ApplicationCall.user get() = authentication.principal<UserWithJWT>()
+val ApplicationCall.user get() = authentication.principal<UserResponseWithJWT>()

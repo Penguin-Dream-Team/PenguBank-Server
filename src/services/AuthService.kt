@@ -16,6 +16,6 @@ class AuthService(private val userRepository: UserRepository) {
     }
 
     fun validateUserJWT(credential: JWTCredential): Principal? =
-        credential.payload.getClaim("id").asInt()?.let(userRepository::getUserOrNull)?.toUserWithToken()
+        credential.payload.getClaim("id").asInt()?.let(userRepository::getUserOrNull)?.toUserResponseWithToken()
 
 }

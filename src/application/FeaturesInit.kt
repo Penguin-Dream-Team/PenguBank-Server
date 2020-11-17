@@ -3,6 +3,7 @@ package club.pengubank.application
 import club.pengubank.errors.ErrorResponse
 import club.pengubank.errors.exceptions.PenguBankException
 import club.pengubank.services.AuthService
+import com.google.gson.annotations.Expose
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -15,6 +16,7 @@ import io.ktor.response.*
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
 import org.slf4j.event.Level
+import java.lang.reflect.Modifier
 import java.text.DateFormat
 
 fun Application.installFeatures() {
@@ -68,7 +70,19 @@ fun Application.installFeatures() {
                 else -> HttpStatusCode.InternalServerError
             }
 
+            println("hello")
             call.respond(status, ErrorResponse(status = status.toString(), message = e.message.toString()))
+        }
+
+        status(HttpStatusCode.NotFound) { status ->
+            call.respond(status, ErrorResponse(status = status.toString(), message = "Requested resource not found."))
+        }
+
+        status(HttpStatusCode.Unauthorized) { status ->
+            call.respond(
+                status,
+                ErrorResponse(status = status.toString(), message = "You need to be logged in to access this resource.")
+            )
         }
     }
 }
