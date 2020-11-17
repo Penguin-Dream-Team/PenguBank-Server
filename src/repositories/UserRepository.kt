@@ -14,11 +14,15 @@ class UserRepository {
     }
 
     fun getUser(userId: Int) = transaction {
-        UserEntity.findById(userId) ?: throw UserNotFoundException(userId)
+        getUserOrNull(userId) ?: throw UserNotFoundException(userId)
     }
 
     fun getUser(email: String) = transaction {
         UserEntity.find { Users.email eq email }.firstOrNull() ?: throw UserWrongEmailException(email)
+    }
+
+    fun getUserOrNull(userId: Int) = transaction {
+        UserEntity.findById(userId)
     }
 
     fun addUser(user: User) = transaction {

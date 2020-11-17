@@ -24,6 +24,10 @@ data class UserGet(val id: Int)
 @Location("/login")
 class LoginUser
 
+@KtorExperimentalLocationsAPI
+@Location("/dashboard")
+class Dashboard
+
 /*
     - Home => optional
 

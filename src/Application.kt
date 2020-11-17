@@ -3,6 +3,7 @@ package club.pengubank
 import club.pengubank.application.bindServices
 import club.pengubank.application.initDatabase
 import club.pengubank.application.installFeatures
+import club.pengubank.controllers.dashboard
 import club.pengubank.controllers.login
 import club.pengubank.controllers.users
 import club.pengubank.controllers.webPages
@@ -30,5 +31,6 @@ fun Application.module(testing: Boolean = false) {
         webPages()
         users()
         login()
+        dashboard()
     }
 }

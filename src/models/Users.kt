@@ -1,5 +1,7 @@
 package club.pengubank.models
 
+import club.pengubank.application.JWTAuthenticationConfig
+import io.ktor.auth.*
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -25,6 +27,7 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     override fun toString(): String = "User($id, $email, $password, $registeredAt)"
 
     fun toUser() = User(id.value, email, password, registeredAt.toString())
+    fun toUserWithToken() = UserWithJWT(toUser())
 }
 
 // JSON Object DTO
@@ -32,5 +35,11 @@ data class User(
     val id: Int,
     val email: String,
     val password: String,
-    val registeredAt: String
+    val registeredAt: String,
 )
+
+// JSON Object DTO
+data class UserWithJWT(
+    val user: User,
+    val token: String = JWTAuthenticationConfig.makeToken(user)
+) : Principal

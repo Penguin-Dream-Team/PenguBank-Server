@@ -2,17 +2,24 @@ package club.pengubank.application
 
 import club.pengubank.errors.ErrorResponse
 import club.pengubank.errors.exceptions.PenguBankException
+import club.pengubank.services.AuthService
 import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
+import org.kodein.di.instance
+import org.kodein.di.ktor.di
 import org.slf4j.event.Level
 import java.text.DateFormat
 
 fun Application.installFeatures() {
+    val authService by di().instance<AuthService>()
+
     install(Locations) { }
 
     install(CallLogging) {
@@ -36,7 +43,15 @@ fun Application.installFeatures() {
         header("X-Engine", "Ktor") // will send this header with each response
     }
 
-    //install(Authentication) { }
+    install(Authentication) {
+        jwt("password-auth") {
+            verifier(JWTAuthenticationConfig.verifier)
+            realm = JWTAuthenticationConfig.issuer
+            validate {
+                authService.validateUserJWT(it)
+            }
+        }
+    }
 
     install(ContentNegotiation) {
         gson {
@@ -56,5 +71,4 @@ fun Application.installFeatures() {
             call.respond(status, ErrorResponse(status = status.toString(), message = e.message.toString()))
         }
     }
-
 }
