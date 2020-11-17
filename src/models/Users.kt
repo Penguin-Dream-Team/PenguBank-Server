@@ -42,8 +42,10 @@ data class UserReponse(
 data class UserResponse(
     val id: Int,
     val email: String,
-    val registeredAt: String,
-)
+    val registeredAt: String
+) {
+    fun toUserResponseWithToken() = UserResponseWithJWT(this)
+}
 
 // JSON Object DTO
 data class UserResponseWithJWT(

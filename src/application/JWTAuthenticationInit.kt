@@ -13,7 +13,7 @@ object JWTAuthenticationConfig {
 
     private const val secret = "zAP5MBA4B4Ijz0MZaS48"
     const val issuer = "pengubank.club"
-    private const val validityInMs = 36_000_00 * 10 // 10 hours
+    private const val validityInMs = 36_000_00 * 1 // 1 hours
     private val algorithm = Algorithm.HMAC512(secret)
 
     val verifier: JWTVerifier = JWT
@@ -25,6 +25,8 @@ object JWTAuthenticationConfig {
         .withSubject("Authentication")
         .withIssuer(issuer)
         .withClaim("id", userRequest.id)
+        .withClaim("email", userRequest.email)
+        .withClaim("registeredAt", userRequest.registeredAt)
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 
