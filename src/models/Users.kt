@@ -14,6 +14,7 @@ object Users: IntIdTable() {
     val email = varchar("email", 128).uniqueIndex()
     val password = varchar("password", 60)
     val registeredAt = datetime("registered_at").defaultExpression(CurrentDateTime())
+    val enabled2FA = bool("enabled_2fa").default(false)
 }
 
 // Database Object DAO
@@ -23,22 +24,23 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     var email by Users.email
     var password by Users.password
     var registeredAt by Users.registeredAt
+    var enabled2FA by Users.enabled2FA
 
-    override fun toString(): String = "User($id, $email, $password, $registeredAt)"
+    override fun toString(): String = "User($id, $email, $password, $registeredAt, $enabled2FA)"
 
-    fun toUserResponse() = UserResponse(id.value, email, registeredAt.toString())
-    fun toUserResponseWithToken() = UserResponseWithJWT(toUserResponse())
-    fun toUser() = User(id.value, email, password, registeredAt.toString())
+    fun toUser() = User(id.value, email, password, registeredAt.toString(), enabled2FA)
 }
 
 data class User(
-    val id: Int,
+    val id: Int? = null,
     val email: String,
     val password: String,
-    val registeredAt: String
+    val registeredAt: String? = null,
+    val enabled2FA: Boolean = false
 ) {
-    fun toUserResponse() = UserResponse(id, email, registeredAt)
+    fun toUserResponse() = UserResponse(id!!, email, registeredAt!!)
     fun toUserResponseWithToken() = UserResponseWithJWT(toUserResponse())
+    fun toUserResponseWith2FAToken() = UserResponseWith2FAJWT(toUserResponse())
 }
 
 // JSON Object DTO
@@ -46,12 +48,19 @@ data class UserResponse(
     val id: Int,
     val email: String,
     val registeredAt: String
-) {
-    fun toUserResponseWithToken() = UserResponseWithJWT(this)
-}
+)
 
 // JSON Object DTO
 data class UserResponseWithJWT(
     val user: UserResponse,
     val token: String = JWTAuthenticationConfig.makeToken(user)
+) : Principal {
+    fun toUserResponseWith2FAToken() = UserResponseWith2FAJWT(user)
+}
+
+// JSON Object DTO
+data class UserResponseWith2FAJWT(
+    val user: UserResponse,
+    val verification2FA: Boolean = true,
+    val token: String = JWTAuthenticationConfig.make2FAToken(user)
 ) : Principal

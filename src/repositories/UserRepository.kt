@@ -18,11 +18,15 @@ class UserRepository {
     }
 
     fun getUser(email: String) = transaction {
-        UserEntity.find { Users.email eq email }.firstOrNull()?.toUser() ?: throw UserWrongEmailException(email)
+        getUserOrNull(email)?.toUser() ?: throw UserWrongEmailException(email)
     }
 
-    fun getUserOrNull(userId: Int) = transaction {
+    private fun getUserOrNull(userId: Int) = transaction {
         UserEntity.findById(userId)
+    }
+
+    private fun getUserOrNull(email: String) = transaction {
+        UserEntity.find { Users.email eq email }.firstOrNull()
     }
 
     fun addUser(user: User) = transaction {
@@ -32,8 +36,7 @@ class UserRepository {
         }.toUser()
     }
 
-    fun deleteUser(userId: Int) = transaction {
-        val user = getUserOrNull(userId) ?: throw UserNotFoundException(userId)
-        user.delete()
+    fun hasUser(email: String): Boolean {
+        return getUserOrNull(email) != null
     }
 }

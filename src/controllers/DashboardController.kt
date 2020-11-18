@@ -15,7 +15,7 @@ import org.kodein.di.ktor.di
 fun Route.dashboard() {
     val userService by di().instance<UserService>()
 
-    authenticate("password-auth") {
+    authenticate("password-2fauth") {
         get<Dashboard> {
             val user = call.user!!
             call.respond(user)

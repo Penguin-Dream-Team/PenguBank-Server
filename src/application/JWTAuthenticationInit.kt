@@ -1,6 +1,7 @@
 package club.pengubank.application
 
 import club.pengubank.models.UserResponse
+import club.pengubank.models.UserResponseWith2FAJWT
 import club.pengubank.models.UserResponseWithJWT
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
@@ -30,7 +31,18 @@ object JWTAuthenticationConfig {
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 
+    fun make2FAToken(userResponse: UserResponse): String = JWT.create()
+        .withSubject("Authentication")
+        .withIssuer(issuer)
+        .withClaim("id", userResponse.id)
+        .withClaim("email", userResponse.email)
+        .withClaim("registeredAt", userResponse.registeredAt)
+        .withClaim("verification2FA", true)
+        .withExpiresAt(getExpiration())
+        .sign(algorithm)
+
     private fun getExpiration() = Date(System.currentTimeMillis() + validityInMs)
 }
 
-val ApplicationCall.user get() = authentication.principal<UserResponseWithJWT>()
+val ApplicationCall.tempUser get() = authentication.principal<UserResponseWithJWT>()
+val ApplicationCall.user get() = authentication.principal<UserResponseWith2FAJWT>()

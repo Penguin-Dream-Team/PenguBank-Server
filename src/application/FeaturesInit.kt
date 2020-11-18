@@ -53,6 +53,14 @@ fun Application.installFeatures() {
                 authService.validateUserJWT(it)
             }
         }
+
+        jwt("password-2fauth") {
+            verifier(JWTAuthenticationConfig.verifier)
+            realm = JWTAuthenticationConfig.issuer
+            validate {
+                authService.validateUser2FAJWT(it)
+            }
+        }
     }
 
     install(ContentNegotiation) {
@@ -70,7 +78,8 @@ fun Application.installFeatures() {
                 else -> HttpStatusCode.InternalServerError
             }
 
-            println("hello")
+            println(e)
+
             call.respond(status, ErrorResponse(status = status.toString(), message = e.message.toString()))
         }
 

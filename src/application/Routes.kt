@@ -21,8 +21,16 @@ class UserList
 data class UserGet(val id: Int)
 
 @KtorExperimentalLocationsAPI
+@Location("/register")
+class RegisterUser
+
+@KtorExperimentalLocationsAPI
 @Location("/login")
 class LoginUser
+
+@KtorExperimentalLocationsAPI
+@Location("/verify")
+class Verify2FA
 
 @KtorExperimentalLocationsAPI
 @Location("/dashboard")
