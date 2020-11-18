@@ -28,15 +28,18 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
 
     fun toUserResponse() = UserResponse(id.value, email, registeredAt.toString())
     fun toUserResponseWithToken() = UserResponseWithJWT(toUserResponse())
+    fun toUser() = User(id.value, email, password, registeredAt.toString())
 }
 
-// JSON Object DTO
-data class UserReponse(
+data class User(
     val id: Int,
     val email: String,
     val password: String,
-    val registeredAt: String,
-)
+    val registeredAt: String
+) {
+    fun toUserResponse() = UserResponse(id, email, registeredAt)
+    fun toUserResponseWithToken() = UserResponseWithJWT(toUserResponse())
+}
 
 // JSON Object DTO
 data class UserResponse(
@@ -49,6 +52,6 @@ data class UserResponse(
 
 // JSON Object DTO
 data class UserResponseWithJWT(
-    val userResponse: UserResponse,
-    val token: String = JWTAuthenticationConfig.makeToken(userResponse)
+    val user: UserResponse,
+    val token: String = JWTAuthenticationConfig.makeToken(user)
 ) : Principal

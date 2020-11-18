@@ -11,10 +11,14 @@ import org.springframework.security.crypto.bcrypt.BCrypt
 
 class AuthService(private val userRepository: UserRepository) {
 
-    fun login(email: String, password: String): UserEntity {
+    fun login(email: String, password: String): UserResponseWithJWT {
         val user = userRepository.getUser(email)
 
-        return if (BCrypt.checkpw(password, user.password)) user else throw UserWrongCredentialsException()
+        return if (BCrypt.checkpw(
+                password,
+                user.password
+            )
+        ) user.toUserResponseWithToken() else throw UserWrongCredentialsException()
     }
 
     fun validateUserJWT(credential: JWTCredential): Principal? {

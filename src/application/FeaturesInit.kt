@@ -74,6 +74,10 @@ fun Application.installFeatures() {
             call.respond(status, ErrorResponse(status = status.toString(), message = e.message.toString()))
         }
 
+        status(HttpStatusCode.UnsupportedMediaType) { status ->
+            call.respond(status, ErrorResponse(status = status.toString(), message = "Request body needs to be of type 'application/json'"))
+        }
+
         status(HttpStatusCode.NotFound) { status ->
             call.respond(status, ErrorResponse(status = status.toString(), message = "Requested resource not found."))
         }

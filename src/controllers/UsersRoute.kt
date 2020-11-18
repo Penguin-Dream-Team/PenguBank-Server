@@ -2,6 +2,7 @@ package club.pengubank.controllers
 
 import club.pengubank.application.UserGet
 import club.pengubank.application.UserList
+import club.pengubank.models.User
 import club.pengubank.models.UserEntity
 import club.pengubank.services.UserService
 import io.ktor.application.*
@@ -16,12 +17,12 @@ fun Route.users() {
     val userService by di().instance<UserService>()
 
     get<UserList> {
-        val allUsers = userService.getAllUsers().map(UserEntity::toUserResponse)
+        val allUsers = userService.getAllUsers().map(User::toUserResponse)
         call.respond(allUsers)
     }
 
     get<UserGet> { userGet ->
-        val user = userService.getUserById(userGet.id)
-        call.respond(user.toUserResponse())
+        val user = userService.getUserById(userGet.id).toUserResponse()
+        call.respond(user)
     }
 }

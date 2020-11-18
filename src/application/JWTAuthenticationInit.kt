@@ -21,12 +21,12 @@ object JWTAuthenticationConfig {
         .withIssuer(issuer)
         .build()
 
-    fun makeToken(userRequest: UserResponse): String = JWT.create()
+    fun makeToken(userResponse: UserResponse): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
-        .withClaim("id", userRequest.id)
-        .withClaim("email", userRequest.email)
-        .withClaim("registeredAt", userRequest.registeredAt)
+        .withClaim("id", userResponse.id)
+        .withClaim("email", userResponse.email)
+        .withClaim("registeredAt", userResponse.registeredAt)
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 
