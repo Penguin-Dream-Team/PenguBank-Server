@@ -2,6 +2,7 @@ package club.pengubank.controllers
 
 import club.pengubank.application.Dashboard
 import club.pengubank.application.user
+import club.pengubank.responses.SuccessResponse
 import club.pengubank.services.UserService
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -17,8 +18,8 @@ fun Route.dashboard() {
 
     authenticate("password-2fauth") {
         get<Dashboard> {
-            val user = call.user!!
-            call.respond(user)
+            val userWithToken = call.user!!
+            call.respond(SuccessResponse(data = userWithToken.user, token = userWithToken.token))
         }
     }
 }

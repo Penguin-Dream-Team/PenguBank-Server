@@ -1,9 +1,8 @@
 package club.pengubank.application
 
-import club.pengubank.errors.ErrorResponse
 import club.pengubank.errors.exceptions.PenguBankException
+import club.pengubank.responses.ErrorResponse
 import club.pengubank.services.AuthService
-import com.google.gson.annotations.Expose
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -16,13 +15,12 @@ import io.ktor.response.*
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
 import org.slf4j.event.Level
-import java.lang.reflect.Modifier
 import java.text.DateFormat
 
 fun Application.installFeatures() {
     val authService by di().instance<AuthService>()
 
-    install(Locations) { }
+    install(Locations)
 
     install(CallLogging) {
         level = Level.INFO
@@ -77,8 +75,6 @@ fun Application.installFeatures() {
                 is PenguBankException -> e.status
                 else -> HttpStatusCode.InternalServerError
             }
-
-            println(e)
 
             call.respond(status, ErrorResponse(status = status.toString(), message = e.message.toString()))
         }

@@ -1,4 +1,4 @@
-package club.pengubank.errors.exceptions.user
+package club.pengubank.responses.exceptions.user
 
 import club.pengubank.errors.exceptions.UnauthorizedException
 

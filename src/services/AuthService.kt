@@ -2,10 +2,10 @@ package club.pengubank.services
 
 import club.pengubank.controllers.RegisterRequest
 import club.pengubank.controllers.Verify2FARequest
-import club.pengubank.errors.exceptions.user.UserInvalid2FACodeException
-import club.pengubank.errors.exceptions.user.UserRegistrationDuplicateEmailException
-import club.pengubank.errors.exceptions.user.UserRegistrationPasswordsDoNotMatch
-import club.pengubank.errors.exceptions.user.UserWrongCredentialsException
+import club.pengubank.responses.exceptions.user.UserInvalid2FACodeException
+import club.pengubank.responses.exceptions.user.UserRegistrationDuplicateEmailException
+import club.pengubank.responses.exceptions.user.UserRegistrationPasswordsDoNotMatch
+import club.pengubank.responses.exceptions.user.UserWrongCredentialsException
 import club.pengubank.models.*
 import club.pengubank.repositories.UserRepository
 import io.ktor.auth.*

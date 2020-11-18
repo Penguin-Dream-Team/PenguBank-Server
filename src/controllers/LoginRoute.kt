@@ -1,7 +1,9 @@
 package club.pengubank.controllers
 
 import club.pengubank.application.*
-import club.pengubank.errors.exceptions.user.UserMissing2FACodeException
+import club.pengubank.responses.exceptions.user.UserMissing2FACodeException
+import club.pengubank.responses.SuccessResponse
+import club.pengubank.responses.exceptions.user.UserAlreadyLoggedInException
 import club.pengubank.services.AuthService
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -18,25 +20,31 @@ import org.kodein.di.ktor.di
 fun Route.login() {
     val authService by di().instance<AuthService>()
 
-    post<LoginUser> {
-        withContext(Dispatchers.IO) {
-            val loginValues = call.receive<LoginRequest>()
-            val loggedUser = authService.login(loginValues.email, loginValues.password)
-            val loginResult =
-                if (loggedUser.enabled2FA)
-                    loggedUser.toUserResponseWithToken()
-                else
-                    loggedUser.toUserResponseWith2FAToken()
+    authenticate("password-auth", "password-2fauth", optional = true) {
+        post<LoginUser> {
+            if (call.user != null || call.tempUser != null) throw UserAlreadyLoggedInException()
 
-            call.respond(loginResult)
+            withContext(Dispatchers.IO) {
+                val loginValues = call.receive<LoginRequest>()
+                val loggedUser = authService.login(loginValues.email, loginValues.password)
+                val token =
+                    if (loggedUser.enabled2FA)
+                        loggedUser.toUserResponseWithToken().token
+                    else
+                        loggedUser.toUserResponseWith2FAToken().token
+
+                call.respond(SuccessResponse(data = loggedUser.toUserResponse(), token = token))
+            }
         }
-    }
 
-    post<RegisterUser> {
-        withContext(Dispatchers.IO) {
-            val registerValues = call.receive<RegisterRequest>()
-            val newUser = authService.register(registerValues)
-            call.respond(mapOf("success" to "true"))
+        post<RegisterUser> {
+            if (call.user != null || call.tempUser != null) throw UserAlreadyLoggedInException()
+
+            withContext(Dispatchers.IO) {
+                val registerValues = call.receive<RegisterRequest>()
+                val newUser = authService.register(registerValues)
+                call.respond(SuccessResponse(data = newUser.toUserResponse()))
+            }
         }
     }
 
@@ -46,7 +54,8 @@ fun Route.login() {
                 val user = call.tempUser!!
                 val verifyValues = call.receiveOrNull<Verify2FARequest>() ?: throw UserMissing2FACodeException()
                 authService.verify2FA(verifyValues)
-                call.respond(user.toUserResponseWith2FAToken())
+                val userResponseWithToken = user.toUserResponseWith2FAToken()
+                call.respond(SuccessResponse(data = userResponseWithToken.user, token = userResponseWithToken.token))
             }
         }
     }

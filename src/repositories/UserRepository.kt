@@ -1,7 +1,7 @@
 package club.pengubank.repositories
 
-import club.pengubank.errors.exceptions.user.UserNotFoundException
-import club.pengubank.errors.exceptions.user.UserWrongEmailException
+import club.pengubank.responses.exceptions.user.UserNotFoundException
+import club.pengubank.responses.exceptions.user.UserWrongEmailException
 import club.pengubank.models.User
 import club.pengubank.models.UserEntity
 import club.pengubank.models.Users
