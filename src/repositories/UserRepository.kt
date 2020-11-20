@@ -25,6 +25,7 @@ class UserRepository {
         UserEntity.new {
             this.email = user.email
             this.password = user.password
+            this.accountId = user.accountId
         }
     }
 
