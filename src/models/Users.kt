@@ -38,7 +38,7 @@ data class User(
     val registeredAt: String? = null,
     val enabled2FA: Boolean = false
 ) {
-    fun toUserResponse() = UserResponse(id!!, email, registeredAt!!)
+    fun toUserResponse() = UserResponse(id!!, email, registeredAt!!, enabled2FA)
     fun toUserResponseWithToken() = UserResponseWithJWT(toUserResponse())
     fun toUserResponseWith2FAToken() = UserResponseWith2FAJWT(toUserResponse())
 }
@@ -47,7 +47,8 @@ data class User(
 data class UserResponse(
     val id: Int,
     val email: String,
-    val registeredAt: String
+    val registeredAt: String,
+    val enabled2FA: Boolean
 )
 
 // JSON Object DTO

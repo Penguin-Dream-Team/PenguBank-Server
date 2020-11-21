@@ -39,6 +39,7 @@ fun Application.installFeatures() {
             anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
         }
     */
+
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
     }
@@ -47,17 +48,13 @@ fun Application.installFeatures() {
         jwt("password-auth") {
             verifier(JWTAuthenticationConfig.verifier)
             realm = JWTAuthenticationConfig.issuer
-            validate {
-                authService.validateUserJWT(it)
-            }
+            validate { authService.validateUserJWT(it) }
         }
 
         jwt("password-2fauth") {
             verifier(JWTAuthenticationConfig.verifier)
             realm = JWTAuthenticationConfig.issuer
-            validate {
-                authService.validateUser2FAJWT(it)
-            }
+            validate { authService.validateUser2FAJWT(it) }
         }
     }
 
@@ -80,7 +77,13 @@ fun Application.installFeatures() {
         }
 
         status(HttpStatusCode.UnsupportedMediaType) { status ->
-            call.respond(status, ErrorResponse(status = status.toString(), message = "Request body needs to be of type 'application/json'"))
+            call.respond(
+                status,
+                ErrorResponse(
+                    status = status.toString(),
+                    message = "Request body needs to be of type 'application/json'"
+                )
+            )
         }
 
         status(HttpStatusCode.NotFound) { status ->

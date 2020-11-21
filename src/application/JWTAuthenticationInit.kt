@@ -25,19 +25,21 @@ object JWTAuthenticationConfig {
     fun makeToken(userResponse: UserResponse): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
-        .withClaim("id", userResponse.id)
-        .withClaim("email", userResponse.email)
-        .withClaim("registeredAt", userResponse.registeredAt)
+        .withClaim(JWTClaims.ID, userResponse.id)
+        .withClaim(JWTClaims.EMAIL, userResponse.email)
+        .withClaim(JWTClaims.REGISTERED_AT, userResponse.registeredAt)
+        .withClaim(JWTClaims.ENABLED_2FA, userResponse.enabled2FA)
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 
     fun make2FAToken(userResponse: UserResponse): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
-        .withClaim("id", userResponse.id)
-        .withClaim("email", userResponse.email)
-        .withClaim("registeredAt", userResponse.registeredAt)
-        .withClaim("verification2FA", true)
+        .withClaim(JWTClaims.ID, userResponse.id)
+        .withClaim(JWTClaims.EMAIL, userResponse.email)
+        .withClaim(JWTClaims.REGISTERED_AT, userResponse.registeredAt)
+        .withClaim(JWTClaims.ENABLED_2FA, userResponse.enabled2FA)
+        .withClaim(JWTClaims.VERIFIED, true)
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 
@@ -46,3 +48,12 @@ object JWTAuthenticationConfig {
 
 val ApplicationCall.tempUser get() = authentication.principal<UserResponseWithJWT>()
 val ApplicationCall.user get() = authentication.principal<UserResponseWith2FAJWT>()
+val ApplicationCall.guest get() = request.headers["Authorization"].isNullOrBlank()
+
+object JWTClaims {
+    const val ID = "id"
+    const val EMAIL = "email"
+    const val REGISTERED_AT = "registeredAt"
+    const val ENABLED_2FA = "enabled2FA"
+    const val VERIFIED = "verified"
+}

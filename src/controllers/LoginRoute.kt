@@ -20,31 +20,29 @@ import org.kodein.di.ktor.di
 fun Route.login() {
     val authService by di().instance<AuthService>()
 
-    authenticate("password-auth", "password-2fauth", optional = true) {
-        post<LoginUser> {
-            if (call.user != null || call.tempUser != null) throw UserAlreadyLoggedInException()
+    post<LoginUser> {
+        if (!call.guest) throw UserAlreadyLoggedInException()
 
-            withContext(Dispatchers.IO) {
-                val loginValues = call.receive<LoginRequest>()
-                val loggedUser = authService.login(loginValues.email, loginValues.password)
-                val token =
-                    if (loggedUser.enabled2FA)
-                        loggedUser.toUserResponseWithToken().token
-                    else
-                        loggedUser.toUserResponseWith2FAToken().token
+        withContext(Dispatchers.IO) {
+            val loginValues = call.receive<LoginRequest>()
+            val loggedUser = authService.login(loginValues.email, loginValues.password)
+            val token =
+                if (loggedUser.enabled2FA)
+                    loggedUser.toUserResponseWithToken().token
+                else
+                    loggedUser.toUserResponseWith2FAToken().token
 
-                call.respond(SuccessResponse(data = loggedUser.toUserResponse(), token = token))
-            }
+            call.respond(SuccessResponse(data = loggedUser.toUserResponse(), token = token))
         }
+    }
 
-        post<RegisterUser> {
-            if (call.user != null || call.tempUser != null) throw UserAlreadyLoggedInException()
+    post<RegisterUser> {
+        if (!call.guest) throw UserAlreadyLoggedInException()
 
-            withContext(Dispatchers.IO) {
-                val registerValues = call.receive<RegisterRequest>()
-                val newUser = authService.register(registerValues)
-                call.respond(SuccessResponse(data = newUser.toUserResponse()))
-            }
+        withContext(Dispatchers.IO) {
+            val registerValues = call.receive<RegisterRequest>()
+            val newUser = authService.register(registerValues)
+            call.respond(SuccessResponse(data = newUser.toUserResponse()))
         }
     }
 

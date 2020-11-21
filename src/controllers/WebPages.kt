@@ -14,12 +14,4 @@ fun Route.webPages() {
             call.respondText("Hello penguins")
         }
     }
-
-    location<About> {
-        get {
-            call.respondText {
-                "hello"
-            }
-        }
-    }
 }

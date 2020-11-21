@@ -1,5 +1,6 @@
 package club.pengubank.services
 
+import club.pengubank.application.JWTClaims
 import club.pengubank.controllers.RegisterRequest
 import club.pengubank.controllers.Verify2FARequest
 import club.pengubank.responses.exceptions.user.UserInvalid2FACodeException
@@ -34,24 +35,27 @@ class AuthService(private val userRepository: UserRepository) {
 
     fun verify2FA(verifyValues: Verify2FARequest) {
         verifyValues.code ?: throw UserInvalid2FACodeException()
-        //TODO("GENERATE CODE AND VALIDATE")
+        if(verifyValues.code != "1337")
+            throw UserInvalid2FACodeException()
     }
 
     fun validateUserJWT(credential: JWTCredential): Principal? {
-        val id = credential.payload.getClaim("id").asInt()
-        val email = credential.payload.getClaim("email").asString()
-        val registeredAt = credential.payload.getClaim("registeredAt").asString()
+        val id = credential.payload.getClaim(JWTClaims.ID).asInt()
+        val email = credential.payload.getClaim(JWTClaims.EMAIL).asString()
+        val registeredAt = credential.payload.getClaim(JWTClaims.REGISTERED_AT).asString()
+        val enabled2FA = credential.payload.getClaim(JWTClaims.ENABLED_2FA).asBoolean()
 
-        return UserResponseWithJWT(UserResponse(id, email, registeredAt))
+        return UserResponseWithJWT(UserResponse(id, email, registeredAt, enabled2FA))
     }
 
     fun validateUser2FAJWT(credential: JWTCredential): Principal? {
-        val id = credential.payload.getClaim("id").asInt()
-        val email = credential.payload.getClaim("email").asString()
-        val registeredAt = credential.payload.getClaim("registeredAt").asString()
-        val verification2FA = credential.payload.getClaim("verification2FA").asBoolean()
+        val id = credential.payload.getClaim(JWTClaims.ID).asInt()
+        val email = credential.payload.getClaim(JWTClaims.EMAIL).asString()
+        val registeredAt = credential.payload.getClaim(JWTClaims.REGISTERED_AT).asString()
+        val enabled2FA = credential.payload.getClaim(JWTClaims.ENABLED_2FA).asBoolean()
+        val verified = credential.payload.getClaim(JWTClaims.VERIFIED).asBoolean()
 
-        return UserResponseWith2FAJWT(UserResponse(id, email, registeredAt), verification2FA)
+        return UserResponseWith2FAJWT(UserResponse(id, email, registeredAt, enabled2FA), verified)
     }
 
 }

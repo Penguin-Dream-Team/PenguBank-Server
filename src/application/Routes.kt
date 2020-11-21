@@ -6,10 +6,6 @@ import io.ktor.locations.*
 @Location("/")
 class Home
 
-@KtorExperimentalLocationsAPI
-@Location("/about")
-class About
-
 /* User Routes */
 
 @KtorExperimentalLocationsAPI
