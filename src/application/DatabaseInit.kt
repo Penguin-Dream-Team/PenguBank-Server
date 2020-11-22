@@ -1,6 +1,5 @@
-package club.pengubank.application
+package application
 
-import club.pengubank.models.Users
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
@@ -25,7 +24,10 @@ fun Application.initDatabase() {
 
 private fun createTables() = transaction {
     SchemaUtils.create(
-        Users,
-        //Accounts
+        models.Users,
+        models.Accounts,
+        models.Transactions
     )
 }
+
+const val DEFAULT_ACCOUNT_BALANCE = 20_000

@@ -1,12 +1,12 @@
-package club.pengubank.services
+package services
 
-import club.pengubank.models.Account
-import club.pengubank.models.AccountEntity
-import club.pengubank.repositories.AccountRepository
+import models.AccountResponse
+import models.AccountEntity
+import repositories.AccountRepository
 
 class AccountService(private val accountRepository: AccountRepository) {
 
-    fun getAllAccounts(): Iterable<Account> = accountRepository.getAllAccounts()
+    fun getAllAccounts(): Iterable<AccountResponse> = accountRepository.getAllAccounts()
 
     fun getAccountById(accountId: Int): AccountEntity = accountRepository.getAccount(accountId)
 }

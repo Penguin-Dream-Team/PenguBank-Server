@@ -1,12 +1,12 @@
-package club.pengubank.services
+package services
 
-import club.pengubank.models.Transaction
-import club.pengubank.models.TransactionEntity
-import club.pengubank.repositories.TransactionRepository
+import models.TransactionResponse
+import models.TransactionEntity
+import repositories.TransactionRepository
 
 class TransactionService(private  val transactionRepository: TransactionRepository) {
 
-    fun getAllTransactions(): Iterable<Transaction> = transactionRepository.getAllTransactions()
+    fun getAllTransactions(accountId: Int): Iterable<TransactionResponse> = transactionRepository.getAllTransactions(accountId)
 
     fun getTransactionById(transactionId: Int): TransactionEntity = transactionRepository.getTransaction(transactionId)
 

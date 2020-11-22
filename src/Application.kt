@@ -1,12 +1,13 @@
 package club.pengubank
 
-import club.pengubank.application.bindServices
-import club.pengubank.application.initDatabase
-import club.pengubank.application.installFeatures
-import club.pengubank.controllers.accounts
-import club.pengubank.controllers.login
-import club.pengubank.controllers.users
-import club.pengubank.controllers.webPages
+import application.bindServices
+import application.initDatabase
+import application.installFeatures
+import controllers.accounts
+import controllers.dashboard
+import controllers.login
+import controllers.users
+import controllers.webPages
 import io.ktor.application.*
 import io.ktor.locations.*
 import io.ktor.routing.*
@@ -32,5 +33,6 @@ fun Application.module(testing: Boolean = false) {
         users()
         login()
         accounts()
+        dashboard()
     }
 }

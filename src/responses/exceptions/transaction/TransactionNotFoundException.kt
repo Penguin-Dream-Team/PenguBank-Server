@@ -1,5 +1,5 @@
-package club.pengubank.errors.exceptions.transaction
+package responses.exceptions.transaction
 
-import club.pengubank.errors.exceptions.NotFoundException
+import responses.exceptions.NotFoundException
 
 data class TransactionNotFoundException(val id: Int) : NotFoundException("Transaction with id '$id' not found")

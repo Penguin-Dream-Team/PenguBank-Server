@@ -1,19 +1,14 @@
-package club.pengubank.controllers
+package controllers
 
-import club.pengubank.application.About
-import club.pengubank.application.Accounts
-import club.pengubank.application.Home
-import club.pengubank.application.Transactions
-import club.pengubank.services.AccountService
-import club.pengubank.services.UserService
+import application.Accounts
+import application.Transactions
+import services.AccountService
 import io.ktor.application.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
-
-
 
 @KtorExperimentalLocationsAPI
 fun Route.accounts() {

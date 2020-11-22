@@ -1,14 +1,14 @@
-package club.pengubank.repositories
+package repositories
 
-import club.pengubank.errors.exceptions.transaction.AccountTransactionsNotFoundException
-import club.pengubank.errors.exceptions.transaction.TransactionNotFoundException
-import club.pengubank.models.*
+import responses.exceptions.transaction.AccountTransactionsNotFoundException
+import responses.exceptions.transaction.TransactionNotFoundException
+import models.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class TransactionRepository {
 
-    fun getAllTransactions(): Iterable<Transaction> = transaction {
-        TransactionEntity.all().map(TransactionEntity::toTransation)
+    fun getAllTransactions(accountId: Int): Iterable<TransactionResponse> = transaction {
+        TransactionEntity.all().map { it.toTransactionResponse(accountId) }
     }
 
     fun getTransaction(transactionId: Int) = transaction {
@@ -20,10 +20,10 @@ class TransactionRepository {
         TransactionEntity.find {Transactions.accountId eq accountId}.asIterable() ?: throw  AccountTransactionsNotFoundException(accountId)
     }
 
-    fun addTransaction(newtransaction: Transaction) = transaction {
+    fun addTransaction(newtransaction: TransactionResponse) = transaction {
         TransactionEntity.new {
             this.amount = newtransaction.amount
-            this.accountId = newtransaction.accountId
+            //this.accountId = newtransaction.accountId
         }
     }
 

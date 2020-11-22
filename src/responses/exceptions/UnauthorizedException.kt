@@ -1,4 +1,4 @@
-package club.pengubank.errors.exceptions
+package responses.exceptions
 
 import io.ktor.http.*
 

@@ -1,10 +1,8 @@
-package club.pengubank.repositories
+package repositories
 
-import club.pengubank.errors.exceptions.user.UserNotFoundException
-import club.pengubank.errors.exceptions.user.UserWrongEmailException
-import club.pengubank.models.User
-import club.pengubank.models.UserEntity
-import club.pengubank.models.Users
+import models.*
+import responses.exceptions.user.UserNotFoundException
+import responses.exceptions.user.UserWrongEmailException
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
@@ -14,23 +12,26 @@ class UserRepository {
     }
 
     fun getUser(userId: Int) = transaction {
-        UserEntity.findById(userId) ?: throw UserNotFoundException(userId)
+        getUserOrNull(userId)?.toUser() ?: throw UserNotFoundException(userId)
     }
 
     fun getUser(email: String) = transaction {
-        UserEntity.find { Users.email eq email }.firstOrNull() ?: throw UserWrongEmailException(email)
+        getUserOrNull(email)?.toUser() ?: throw UserWrongEmailException(email)
+    }
+
+    private fun getUserOrNull(userId: Int) = transaction {
+        UserEntity.findById(userId)
+    }
+
+    private fun getUserOrNull(email: String) = transaction {
+        UserEntity.find { Users.email eq email }.firstOrNull()
     }
 
     fun addUser(user: User) = transaction {
-        UserEntity.new {
-            this.email = user.email
-            this.password = user.password
-            this.accountId = user.accountId
-        }
+        UserEntity.create(user.email, user.password).toUser()
     }
 
-    fun deleteUser(userId: Int) = transaction {
-        val user = getUser(userId)
-        user.delete()
+    fun hasUser(email: String): Boolean {
+        return getUserOrNull(email) != null
     }
 }

@@ -1,12 +1,12 @@
-package club.pengubank.application
+package application
 
-import club.pengubank.repositories.AccountRepository
-import club.pengubank.repositories.TransactionRepository
-import club.pengubank.repositories.UserRepository
-import club.pengubank.services.AccountService
-import club.pengubank.services.AuthService
-import club.pengubank.services.TransactionService
-import club.pengubank.services.UserService
+import repositories.AccountRepository
+import repositories.TransactionRepository
+import repositories.UserRepository
+import services.AccountService
+import services.AuthService
+import services.TransactionService
+import services.UserService
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton

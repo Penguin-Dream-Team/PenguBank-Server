@@ -1,12 +1,12 @@
-package club.pengubank.services
+package services
 
-import club.pengubank.models.User
-import club.pengubank.models.UserEntity
-import club.pengubank.repositories.UserRepository
+import models.User
+import models.UserEntity
+import repositories.UserRepository
 
 class UserService(private val userRepository: UserRepository) {
 
     fun getAllUsers(): Iterable<User> = userRepository.getAllUsers()
 
-    fun getUserById(userId: Int): UserEntity = userRepository.getUser(userId)
+    fun getUserById(userId: Int): User = userRepository.getUser(userId)
 }

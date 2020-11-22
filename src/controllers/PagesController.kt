@@ -1,7 +1,6 @@
-package club.pengubank.controllers
+package controllers
 
-import club.pengubank.application.About
-import club.pengubank.application.Home
+import application.Home
 import io.ktor.application.*
 import io.ktor.locations.*
 import io.ktor.response.*
@@ -12,14 +11,6 @@ fun Route.webPages() {
     location<Home> {
         get {
             call.respondText("Hello penguins")
-        }
-    }
-
-    location<About> {
-        get {
-            call.respondText {
-                "hello"
-            }
         }
     }
 }
