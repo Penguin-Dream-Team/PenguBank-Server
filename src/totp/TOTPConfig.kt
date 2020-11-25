@@ -15,7 +15,7 @@ import kotlin.math.pow
  */
 data class TOTPConfig(
     val timeStepSize: Duration = Duration.ofSeconds(30),
-    val windowSize: Int = 3,
+    val windowSize: Int = 2,
     val codeDigits: Int = 6,
     val keyModulus: Long = 10.0.pow(codeDigits.toDouble()).toLong()
 ) {

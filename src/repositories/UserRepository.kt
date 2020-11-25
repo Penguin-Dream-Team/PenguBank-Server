@@ -34,4 +34,8 @@ class UserRepository {
     fun hasUser(email: String): Boolean {
         return getUserOrNull(email) != null
     }
+
+    fun activate2FA(userId: Int) = transaction {
+        getUserOrNull(userId)!!.enabled2FA = true
+    }
 }

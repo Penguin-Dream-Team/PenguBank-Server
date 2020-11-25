@@ -28,6 +28,10 @@ class TOTPAuthenticator() {
         return TOTPCredentials(TOTPSecretKey(key), validationCode, scratchCodes)
     }
 
+    fun createSecretKey(): TOTPSecretKey {
+        return TOTPAuthenticator().createCredentials().secretKey
+    }
+
     fun authorize(secretKey: TOTPSecretKey, totp: Int, time: Instant = Instant.now()): Boolean {
         // Checking if the verification code is between the legal bounds.
         if (totp <= 0 || totp >= config.keyModulus) {

@@ -27,6 +27,10 @@ class Verify2FA
 class Dashboard
 
 @KtorExperimentalLocationsAPI
+@Location("/activate")
+class Activate2FA
+
+@KtorExperimentalLocationsAPI
 @Location("/accounts")
 class Accounts
 

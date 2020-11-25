@@ -34,14 +34,15 @@ class AuthService(private val userRepository: UserRepository) {
 
         val cipheredPassword = BCrypt.hashpw(registerValues.password, BCrypt.gensalt())
 
-        val secretKey = TOTPAuthenticator().createCredentials().secretKey
+        val secretKey = TOTPAuthenticator().createSecretKey()
 
-        return userRepository.addUser(User(email = registerValues.email, password = cipheredPassword, secretKey = secretKey.to(TOTPSecretKey.KeyRepresentation.BASE64)))
+        return userRepository.addUser(User(email = registerValues.email, password = cipheredPassword, secretKey = secretKey.toString()))
     }
 
     fun verify2FA(userId: Int, verifyValues: Verify2FARequest) {
         verifyValues.code ?: throw UserInvalid2FACodeException()
-        val secretKey = TOTPSecretKey.from(TOTPSecretKey.KeyRepresentation.BASE64, userRepository.getUser(userId).secretKey)
+        val secretKey = userRepository.getUser(userId).getSecretKey()
+
         if(!TOTPAuthenticator().authorize(secretKey, verifyValues.code))
             throw UserInvalid2FACodeException()
     }

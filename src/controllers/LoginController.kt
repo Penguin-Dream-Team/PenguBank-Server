@@ -34,8 +34,6 @@ fun Route.login() {
                 else
                     loggedUser.toUserResponseWith2FAToken().token
 
-            val url = QRCodeFactory.createQRCodeURL("Acme", loggedUser.email, TOTPSecretKey.from(TOTPSecretKey.KeyRepresentation.BASE64, loggedUser.secretKey))
-            println(url)
             call.respond(SuccessResponse(data = loggedUser.toSimpleUserResponse(), token = token))
         }
     }

@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
 import totp.TOTPConfig
 import totp.TOTPCredentials
+import totp.TOTPSecretKey
 import javax.crypto.SecretKey
 
 // Table Object
@@ -63,6 +64,8 @@ data class User(
     fun toSimpleUserResponse() = SimpleUserResponse(id!!, email, registeredAt!!, enabled2FA, account!!.id)
     fun toUserResponseWithToken() = UserResponseWithJWT(toSimpleUserResponse())
     fun toUserResponseWith2FAToken() = UserResponseWith2FAJWT(toSimpleUserResponse())
+
+    fun getSecretKey(): TOTPSecretKey = TOTPSecretKey.from(value = secretKey)
 }
 
 // JSON Object DTO
