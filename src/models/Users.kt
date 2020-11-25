@@ -10,6 +10,9 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
+import totp.TOTPConfig
+import totp.TOTPCredentials
+import javax.crypto.SecretKey
 
 // Table Object
 object Users: IntIdTable() {
@@ -18,18 +21,20 @@ object Users: IntIdTable() {
     val registeredAt = datetime("registered_at").defaultExpression(CurrentDateTime())
     val enabled2FA = bool("enabled_2fa").default(false)
     val accountId = reference("account_id", Accounts, ReferenceOption.CASCADE)
+    val secretKey = varchar("secret_key", 128)
 }
 
 // Database Object DAO
 class UserEntity(id: EntityID<Int>): IntEntity(id) {
     companion object : IntEntityClass<UserEntity>(Users) {
-        fun create(email: String, password: String): UserEntity {
+        fun create(email: String, password: String, secretKey: String): UserEntity {
             return new {
                 this.email = email
                 this.password = password
                 this.account = AccountEntity.new {
                     this.balance = DEFAULT_ACCOUNT_BALANCE
                 }
+                this.secretKey = secretKey
             }
         }
     }
@@ -39,10 +44,11 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     var registeredAt by Users.registeredAt
     var account by AccountEntity referencedOn Users.accountId
     var enabled2FA by Users.enabled2FA
+    var secretKey by Users.secretKey
 
     override fun toString(): String = "User($id, $email, $password, $registeredAt, $enabled2FA, ${account.toAccountResponse()})"
 
-    fun toUser() = User(id.value, email, password, registeredAt.toString(), enabled2FA, account.toAccountResponse())
+    fun toUser() = User(id.value, email, password, registeredAt.toString(), enabled2FA, account.toAccountResponse(), secretKey)
 }
 
 data class User(
@@ -51,7 +57,8 @@ data class User(
     val password: String,
     val registeredAt: String? = null,
     val enabled2FA: Boolean = false,
-    val account: AccountResponse? = null
+    val account: AccountResponse? = null,
+    val secretKey: String
 ) {
     fun toSimpleUserResponse() = SimpleUserResponse(id!!, email, registeredAt!!, enabled2FA, account!!.id)
     fun toUserResponseWithToken() = UserResponseWithJWT(toSimpleUserResponse())

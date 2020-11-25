@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
+import totp.QRCodeFactory
+import totp.TOTPSecretKey
 
 @KtorExperimentalLocationsAPI
 fun Route.login() {
@@ -32,6 +34,8 @@ fun Route.login() {
                 else
                     loggedUser.toUserResponseWith2FAToken().token
 
+            val url = QRCodeFactory.createQRCodeURL("Acme", loggedUser.email, TOTPSecretKey.from(TOTPSecretKey.KeyRepresentation.BASE64, loggedUser.secretKey))
+            println(url)
             call.respond(SuccessResponse(data = loggedUser.toSimpleUserResponse(), token = token))
         }
     }
@@ -51,7 +55,7 @@ fun Route.login() {
             withContext(Dispatchers.IO) {
                 val user = call.tempUser!!
                 val verifyValues = call.receiveOrNull<Verify2FARequest>() ?: throw UserMissing2FACodeException()
-                authService.verify2FA(verifyValues)
+                authService.verify2FA(user.user.id, verifyValues)
                 val userResponseWithToken = user.toUserResponseWith2FAToken()
                 call.respond(SuccessResponse(data = userResponseWithToken.user, token = userResponseWithToken.token))
             }
@@ -61,4 +65,4 @@ fun Route.login() {
 
 data class RegisterRequest(val email: String, val password: String, val confirmPassword: String)
 data class LoginRequest(val email: String, val password: String)
-data class Verify2FARequest(val code: String?)
+data class Verify2FARequest(val code: Int?)

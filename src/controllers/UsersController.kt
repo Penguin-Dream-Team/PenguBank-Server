@@ -1,6 +1,5 @@
 package controllers
 
-import application.UserGet
 import application.UserList
 import application.user
 import io.ktor.application.*

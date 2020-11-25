@@ -12,6 +12,9 @@ import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import org.springframework.security.crypto.bcrypt.BCrypt
 import repositories.UserRepository
+import totp.TOTPAuthenticator
+import totp.TOTPSecretKey
+import java.time.Instant
 
 class AuthService(private val userRepository: UserRepository) {
 
@@ -30,12 +33,16 @@ class AuthService(private val userRepository: UserRepository) {
         if (registerValues.password != registerValues.confirmPassword) throw UserRegistrationPasswordsDoNotMatch()
 
         val cipheredPassword = BCrypt.hashpw(registerValues.password, BCrypt.gensalt())
-        return userRepository.addUser(User(email = registerValues.email, password = cipheredPassword))
+
+        val secretKey = TOTPAuthenticator().createCredentials().secretKey
+
+        return userRepository.addUser(User(email = registerValues.email, password = cipheredPassword, secretKey = secretKey.to(TOTPSecretKey.KeyRepresentation.BASE64)))
     }
 
-    fun verify2FA(verifyValues: Verify2FARequest) {
+    fun verify2FA(userId: Int, verifyValues: Verify2FARequest) {
         verifyValues.code ?: throw UserInvalid2FACodeException()
-        if(verifyValues.code != "1337")
+        val secretKey = TOTPSecretKey.from(TOTPSecretKey.KeyRepresentation.BASE64, userRepository.getUser(userId).secretKey)
+        if(!TOTPAuthenticator().authorize(secretKey, verifyValues.code))
             throw UserInvalid2FACodeException()
     }
 

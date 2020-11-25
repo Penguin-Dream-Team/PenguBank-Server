@@ -28,7 +28,7 @@ class UserRepository {
     }
 
     fun addUser(user: User) = transaction {
-        UserEntity.create(user.email, user.password).toUser()
+        UserEntity.create(user.email, user.password, user.secretKey).toUser()
     }
 
     fun hasUser(email: String): Boolean {
