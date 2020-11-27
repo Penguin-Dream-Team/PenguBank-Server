@@ -73,27 +73,24 @@ fun Application.installFeatures() {
                 else -> HttpStatusCode.InternalServerError
             }
 
-            call.respond(status, ErrorResponse(status = status.toString(), message = e.message.toString()))
+            call.respond(status, ErrorResponse(message = e.message.toString()))
         }
 
         status(HttpStatusCode.UnsupportedMediaType) { status ->
             call.respond(
                 status,
-                ErrorResponse(
-                    status = status.toString(),
-                    message = "Request body needs to be of type 'application/json'"
-                )
+                ErrorResponse(message = "Request body needs to be of type 'application/json'")
             )
         }
 
         status(HttpStatusCode.NotFound) { status ->
-            call.respond(status, ErrorResponse(status = status.toString(), message = "Requested resource not found."))
+            call.respond(status, ErrorResponse(message = "Requested resource not found."))
         }
 
         status(HttpStatusCode.Unauthorized) { status ->
             call.respond(
                 status,
-                ErrorResponse(status = status.toString(), message = "You need to be logged in to access this resource.")
+                ErrorResponse(message = "You need to be logged in to access this resource.")
             )
         }
     }
