@@ -3,6 +3,7 @@ package repositories
 import responses.exceptions.transaction.AccountTransactionsNotFoundException
 import responses.exceptions.transaction.TransactionNotFoundException
 import models.*
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class TransactionRepository {
@@ -20,15 +21,17 @@ class TransactionRepository {
         TransactionEntity.find {Transactions.accountId eq accountId}.asIterable() ?: throw  AccountTransactionsNotFoundException(accountId)
     }
 
-    fun addTransaction(newtransaction: TransactionResponse) = transaction {
+    fun addTransaction(accountId: Int, destinationId: Int, amount: Int) = transaction {
+        AccountEntity[accountId].balance -= amount
+
         TransactionEntity.new {
-            this.amount = newtransaction.amount
-            //this.accountId = newtransaction.accountId
-        }
+            this.amount = amount
+            this.accountId = EntityID(accountId, Accounts)
+            this.destinationId = EntityID(destinationId, Accounts)
+        }.toTransactionResponse(accountId)
     }
 
     fun deleteTransaction(transactionId: Int) = transaction {
-        val oldTransaction = getTransaction(transactionId)
-        oldTransaction.delete()
+        getTransaction(transactionId).delete()
     }
 }

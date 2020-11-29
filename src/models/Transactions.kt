@@ -1,5 +1,6 @@
 package models
 
+import application.DEFAULT_ACCOUNT_BALANCE
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -21,6 +22,8 @@ class TransactionEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TransactionEntity>(Transactions)
 
     var amount by Transactions.amount
+    var accountId by Transactions.accountId
+    var destinationId by Transactions.destinationId
     var createdAt by Transactions.createdAt
 
     private val account by AccountEntity referencedOn Transactions.accountId

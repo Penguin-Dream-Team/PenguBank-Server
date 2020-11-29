@@ -39,8 +39,8 @@ class Activate2FA
 class Accounts
 
 @KtorExperimentalLocationsAPI
-@Location("/transactions")
-class Transactions
+@Location("/transaction")
+class Transaction
 
 /*
     - Home => optional
