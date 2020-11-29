@@ -19,6 +19,10 @@ class RegisterUser
 class LoginUser
 
 @KtorExperimentalLocationsAPI
+@Location("/setup")
+class SetupPhone
+
+@KtorExperimentalLocationsAPI
 @Location("/verify")
 class Verify2FA
 

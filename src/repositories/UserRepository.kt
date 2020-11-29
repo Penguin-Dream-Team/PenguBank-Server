@@ -38,4 +38,12 @@ class UserRepository {
     fun activate2FA(userId: Int) = transaction {
         getUserOrNull(userId)!!.enabled2FA = true
     }
+
+    fun addPhonePublicKey(userId: Int, phonePublicKey: String) = transaction {
+        getUserOrNull(userId)!!.phonePublicKey = phonePublicKey
+    }
+
+    fun hasPhonePublicKey(userId: Int): Boolean {
+        return getUserOrNull(userId) != null
+    }
 }

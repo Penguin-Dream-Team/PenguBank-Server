@@ -23,6 +23,7 @@ object Users: IntIdTable() {
     val enabled2FA = bool("enabled_2fa").default(false)
     val accountId = reference("account_id", Accounts, ReferenceOption.CASCADE)
     val secretKey = varchar("secret_key", 128)
+    val phonePublicKey = varchar("phone_public_key", 128)
 }
 
 // Database Object DAO
@@ -46,6 +47,7 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     var account by AccountEntity referencedOn Users.accountId
     var enabled2FA by Users.enabled2FA
     var secretKey by Users.secretKey
+    var phonePublicKey by Users.phonePublicKey
 
     override fun toString(): String = "User($id, $email, $password, $registeredAt, $enabled2FA, ${account.toAccountResponse()})"
 
@@ -60,6 +62,7 @@ data class User(
     val enabled2FA: Boolean = false,
     val account: AccountResponse? = null,
     val secretKey: String
+
 ) {
     fun toSimpleUserResponse() = SimpleUserResponse(id!!, email, registeredAt!!, enabled2FA, account!!.id)
     fun toUserResponseWithToken() = UserResponseWithJWT(toSimpleUserResponse())

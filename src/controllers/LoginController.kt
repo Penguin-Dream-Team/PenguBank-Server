@@ -15,12 +15,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
-import totp.QRCodeFactory
-import totp.TOTPSecretKey
+import responses.ErrorResponse
+import services.UserService
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ErrorReporter
 
 @KtorExperimentalLocationsAPI
 fun Route.login() {
     val authService by di().instance<AuthService>()
+    val userService by di().instance<UserService>()
+
+    post<RegisterUser> {
+        if (!call.guest) throw UserAlreadyLoggedInException()
+
+        withContext(Dispatchers.IO) {
+            val registerValues = call.receive<RegisterRequest>()
+            val newUser = authService.register(registerValues)
+            call.respond(SuccessResponse(data = newUser.toSimpleUserResponse()))
+        }
+    }
 
     post<LoginUser> {
         if (!call.guest) throw UserAlreadyLoggedInException()
@@ -38,13 +50,23 @@ fun Route.login() {
         }
     }
 
-    post<RegisterUser> {
+    post<SetupPhone> {
         if (!call.guest) throw UserAlreadyLoggedInException()
 
         withContext(Dispatchers.IO) {
-            val registerValues = call.receive<RegisterRequest>()
-            val newUser = authService.register(registerValues)
-            call.respond(SuccessResponse(data = newUser.toSimpleUserResponse()))
+            val setupValues = call.receive<SetupRequest>()
+            val loggedUser = authService.login(setupValues.email, setupValues.password)
+            if (loggedUser.enabled2FA) {
+                if (!userService.hasPhonePublicKey(loggedUser.id!!)) {
+                    userService.storePhonePublicKey(loggedUser.id, setupValues.phonePublicKey)
+                    call.respond(SuccessResponse(data = loggedUser.toSimpleUserResponse(), token = loggedUser.secretKey))
+                }
+                else {
+                    call.respond(ErrorResponse("You already registered a phone"))
+                }
+            }
+            else
+                call.respond(ErrorResponse("You must enable 2FA to perform this action"))
         }
     }
 
@@ -63,4 +85,5 @@ fun Route.login() {
 
 data class RegisterRequest(val email: String, val password: String, val confirmPassword: String)
 data class LoginRequest(val email: String, val password: String)
+data class SetupRequest(val email: String, val password: String, val phonePublicKey: String)
 data class Verify2FARequest(val code: Int?)

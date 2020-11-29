@@ -14,4 +14,8 @@ class UserService(private val userRepository: UserRepository) {
         userRepository.activate2FA(userId)
         return userRepository.getUser(userId)
     }
+
+    fun storePhonePublicKey(userId: Int, phonePublicKey: String) = userRepository.addPhonePublicKey(userId, phonePublicKey)
+
+    fun hasPhonePublicKey(userId: Int): Boolean = userRepository.hasPhonePublicKey(userId)
 }

@@ -16,5 +16,4 @@ fun DI.MainBuilder.bindServices() {
     bind<UserService>() with singleton { UserService(UserRepository()) }
     bind<AccountService>() with singleton { AccountService(AccountRepository()) }
     bind<TransactionService>() with singleton { TransactionService(TransactionRepository()) }
-
 }

@@ -121,6 +121,7 @@ class TOTPAuthenticator() {
         for (i in start..end) {
             // Calculating the verification code for the current time interval.
             val hash = calculateCode(key, timeWindow + i)
+            println("hash $hash")
             // Checking if the provided code is equal to the calculated one.
             if (hash == code) {
                 return true
