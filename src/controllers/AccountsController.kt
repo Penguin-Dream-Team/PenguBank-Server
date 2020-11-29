@@ -36,7 +36,19 @@ fun Route.accounts() {
                 val userWithToken = call.user!!
                 val user = userService.getUserById(userWithToken.user.id)
 
-                val transactionResponse = transactionService.newTransaction(user.account!!, transactionValues.accountDestinationId, transactionValues.amount)
+                val queuedTransactionResponse = transactionService.newTransaction(user.account!!, transactionValues.accountDestinationId, transactionValues.amount)
+                call.respond(SuccessResponse(data = queuedTransactionResponse, token = userWithToken.token))
+            }
+        }
+
+        put<Transaction> {
+            withContext(Dispatchers.IO) {
+                val transactionValues = call.receive<EndTransactionRequest>()
+                // if not signed return error
+
+                val userWithToken = call.user!!
+
+                val transactionResponse = transactionService.endQueuedTransaction(transactionValues.transactionId)
                 call.respond(SuccessResponse(data = transactionResponse, token = userWithToken.token))
             }
         }
@@ -44,3 +56,5 @@ fun Route.accounts() {
 }
 
 data class TransactionRequest(val accountDestinationId: Int, val amount: Int)
+data class EndTransactionRequest(val transactionId: Int, val signedToken: Int)
+

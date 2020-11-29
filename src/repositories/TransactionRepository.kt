@@ -23,6 +23,7 @@ class TransactionRepository {
 
     fun addTransaction(accountId: Int, destinationId: Int, amount: Int) = transaction {
         AccountEntity[accountId].balance -= amount
+        AccountEntity[destinationId].balance += amount
 
         TransactionEntity.new {
             this.amount = amount

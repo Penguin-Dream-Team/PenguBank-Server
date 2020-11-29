@@ -26,7 +26,8 @@ private fun createTables() = transaction {
     SchemaUtils.create(
         models.Users,
         models.Accounts,
-        models.Transactions
+        models.Transactions,
+        models.QueuedTransactions
     )
 }
 

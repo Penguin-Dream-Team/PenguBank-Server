@@ -1,6 +1,5 @@
 package models
 
-import application.DEFAULT_ACCOUNT_BALANCE
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
