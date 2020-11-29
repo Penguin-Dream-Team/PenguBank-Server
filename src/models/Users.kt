@@ -23,7 +23,7 @@ object Users: IntIdTable() {
     val enabled2FA = bool("enabled_2fa").default(false)
     val accountId = reference("account_id", Accounts, ReferenceOption.CASCADE)
     val secretKey = varchar("secret_key", 128)
-    val phonePublicKey = varchar("phone_public_key", 128)
+    val phonePublicKey = varchar("phone_public_key", 128).nullable()
 }
 
 // Database Object DAO
