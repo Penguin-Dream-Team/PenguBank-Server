@@ -48,7 +48,7 @@ object QRCodeFactory {
             .setScheme("otpauth")
             .setHost("totp")
             .setPath("/" + formatLabel(issuer, accountName))
-            .setParameter("secret", secretKey.toString())
+            .setParameter("secret", secretKey.to(TOTPSecretKey.KeyRepresentation.BASE32))
         issuer?.let { builder.setParameter("issuer", issuer) }
         return builder.toString()
     }
