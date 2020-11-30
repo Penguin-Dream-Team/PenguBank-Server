@@ -50,23 +50,16 @@ fun Route.login() {
         }
     }
 
-    post<SetupPhone> {
-        if (!call.guest) throw UserAlreadyLoggedInException()
+    authenticate("password-2fauth") {
+        post<SetupPhone> {
+            val loggedUser = call.user!!
 
-        withContext(Dispatchers.IO) {
-            val setupValues = call.receive<SetupRequest>()
-            val loggedUser = authService.login(setupValues.email, setupValues.password)
-            if (loggedUser.enabled2FA) {
-                if (!userService.hasPhonePublicKey(loggedUser.id!!)) {
-                    userService.storePhonePublicKey(loggedUser.id, setupValues.phonePublicKey)
-                    call.respond(SuccessResponse(data = loggedUser.toSimpleUserResponse(), token = loggedUser.secretKey))
-                }
-                else {
-                    call.respond(ErrorResponse("You already registered a phone"))
-                }
+            withContext(Dispatchers.IO) {
+                val setupValues = call.receive<SetupRequest>()
+                userService.setupPhone(loggedUser.user, setupValues.phoneMACAddress, setupValues.phonePublicKey)
+
+                call.respond(SuccessResponse(data = loggedUser))
             }
-            else
-                call.respond(ErrorResponse("You must enable 2FA to perform this action"))
         }
     }
 
@@ -85,5 +78,5 @@ fun Route.login() {
 
 data class RegisterRequest(val email: String, val password: String, val confirmPassword: String)
 data class LoginRequest(val email: String, val password: String)
-data class SetupRequest(val email: String, val password: String, val phonePublicKey: String)
+data class SetupRequest(val phonePublicKey: String, val phoneMACAddress: String)
 data class Verify2FARequest(val code: Int?)

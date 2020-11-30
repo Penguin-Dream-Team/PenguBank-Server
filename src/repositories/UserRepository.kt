@@ -43,7 +43,15 @@ class UserRepository {
         getUserOrNull(userId)!!.phonePublicKey = phonePublicKey
     }
 
+    fun addPhoneMACAddress(userId: Int, phoneMACAddress: String) = transaction {
+        getUserOrNull(userId)!!.phoneMACAddress = phoneMACAddress
+    }
+
     fun hasPhonePublicKey(userId: Int): Boolean {
-        return getUserOrNull(userId) != null
+        return getUserOrNull(userId)?.phonePublicKey?.isNotBlank() ?: false
+    }
+
+    fun hasPhoneMACAddress(userId: Int): Boolean {
+        return getUserOrNull(userId)?.phoneMACAddress?.isNotBlank() ?: false
     }
 }

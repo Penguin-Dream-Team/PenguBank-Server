@@ -1,8 +1,9 @@
 package services
 
+import club.pengubank.responses.exceptions.user.UserPhoneAlreadyRegisteredException
+import models.SimpleUserResponse
 import models.User
 import repositories.UserRepository
-import totp.TOTPSecretKey
 
 class UserService(private val userRepository: UserRepository) {
 
@@ -15,7 +16,24 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.getUser(userId)
     }
 
-    fun storePhonePublicKey(userId: Int, phonePublicKey: String) = userRepository.addPhonePublicKey(userId, phonePublicKey)
+    fun setupPhone(loggedUser: SimpleUserResponse, phoneMACAddress: String, phonePublicKey: String) {
+        storePhonePublicKey(loggedUser, phonePublicKey)
+        storePhoneMACAddress(loggedUser, phoneMACAddress)
+    }
 
-    fun hasPhonePublicKey(userId: Int): Boolean = userRepository.hasPhonePublicKey(userId)
+    private fun storePhoneMACAddress(user: SimpleUserResponse, phoneMACAddress: String) {
+        if (hasPhoneMACAddress(user.id))
+            throw UserPhoneAlreadyRegisteredException()
+        userRepository.addPhoneMACAddress(user.id, phoneMACAddress)
+    }
+
+    private fun storePhonePublicKey(user: SimpleUserResponse, phonePublicKey: String) {
+        if (hasPhonePublicKey(user.id))
+            throw UserPhoneAlreadyRegisteredException()
+        userRepository.addPhonePublicKey(user.id, phonePublicKey)
+    }
+
+    private fun hasPhonePublicKey(userId: Int): Boolean = userRepository.hasPhonePublicKey(userId)
+
+    private fun hasPhoneMACAddress(userId: Int): Boolean = userRepository.hasPhoneMACAddress(userId)
 }

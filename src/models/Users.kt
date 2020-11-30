@@ -24,6 +24,7 @@ object Users: IntIdTable() {
     val accountId = reference("account_id", Accounts, ReferenceOption.CASCADE)
     val secretKey = varchar("secret_key", 128)
     val phonePublicKey = varchar("phone_public_key", 128).nullable()
+    val phoneMACAddress = varchar("phone_mac_address", 128).nullable()
 }
 
 // Database Object DAO
@@ -48,8 +49,9 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     var enabled2FA by Users.enabled2FA
     var secretKey by Users.secretKey
     var phonePublicKey by Users.phonePublicKey
+    var phoneMACAddress by Users.phoneMACAddress
 
-    override fun toString(): String = "User($id, $email, $password, $registeredAt, $enabled2FA, ${account.toAccountResponse()})"
+    override fun toString(): String = "User($id, $email, $password, $registeredAt, $enabled2FA, ${account.toAccountResponse()}, $phonePublicKey, $phoneMACAddress)"
 
     fun toUser() = User(id.value, email, password, registeredAt.toString(), enabled2FA, account.toAccountResponse(), secretKey)
 }
