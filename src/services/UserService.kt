@@ -16,15 +16,8 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.getUser(userId)
     }
 
-    fun setupPhone(loggedUser: SimpleUserResponse, phoneMACAddress: String, phonePublicKey: String) {
+    fun setupPhone(loggedUser: SimpleUserResponse, phonePublicKey: String) {
         storePhonePublicKey(loggedUser, phonePublicKey)
-        storePhoneMACAddress(loggedUser, phoneMACAddress)
-    }
-
-    private fun storePhoneMACAddress(user: SimpleUserResponse, phoneMACAddress: String) {
-        if (hasPhoneMACAddress(user.id))
-            throw UserPhoneAlreadyRegisteredException()
-        userRepository.addPhoneMACAddress(user.id, phoneMACAddress)
     }
 
     private fun storePhonePublicKey(user: SimpleUserResponse, phonePublicKey: String) {
@@ -34,6 +27,4 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     private fun hasPhonePublicKey(userId: Int): Boolean = userRepository.hasPhonePublicKey(userId)
-
-    private fun hasPhoneMACAddress(userId: Int): Boolean = userRepository.hasPhoneMACAddress(userId)
 }

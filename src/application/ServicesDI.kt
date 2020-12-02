@@ -13,8 +13,14 @@ import org.kodein.di.bind
 import org.kodein.di.singleton
 
 fun DI.MainBuilder.bindServices() {
-    bind<AuthService>() with singleton { AuthService(UserRepository()) }
-    bind<UserService>() with singleton { UserService(UserRepository()) }
-    bind<AccountService>() with singleton { AccountService(AccountRepository()) }
-    bind<TransactionService>() with singleton { TransactionService(TransactionRepository(), QueuedTransactionRepository()) }
+
+    val userRepository = UserRepository()
+    val accountRepository = AccountRepository()
+    val transactionRepository = TransactionRepository(accountRepository)
+    val queuedTransactionRepository = QueuedTransactionRepository(accountRepository, transactionRepository)
+
+    bind<AuthService>() with singleton { AuthService(userRepository) }
+    bind<UserService>() with singleton { UserService(userRepository) }
+    bind<AccountService>() with singleton { AccountService(accountRepository) }
+    bind<TransactionService>() with singleton { TransactionService(transactionRepository, queuedTransactionRepository) }
 }

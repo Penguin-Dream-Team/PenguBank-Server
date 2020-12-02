@@ -42,6 +42,14 @@ class Accounts
 @Location("/transaction")
 class Transaction
 
+@KtorExperimentalLocationsAPI
+@Location("/transaction/approve")
+class ApproveTransaction
+
+@KtorExperimentalLocationsAPI
+@Location("/transaction/cancel")
+class CancelTransaction
+
 /*
     - Home => optional
 

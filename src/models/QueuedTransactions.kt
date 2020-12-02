@@ -7,6 +7,8 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
+import org.joda.time.DateTime
+import org.springframework.security.crypto.keygen.KeyGenerators.string
 
 // Table Object
 object QueuedTransactions : IntIdTable() {
@@ -14,6 +16,7 @@ object QueuedTransactions : IntIdTable() {
     val accountId = reference("account_id", Accounts, onDelete = ReferenceOption.CASCADE)
     val destinationId = reference("destination_id", Accounts, onDelete = ReferenceOption.CASCADE)
     val createdAt = datetime("created_at").defaultExpression(CurrentDateTime())
+    val token = varchar("token", 128)
 }
 
 // Database Object DAO
@@ -23,13 +26,24 @@ class QueuedTransactionEntity(id: EntityID<Int>) : IntEntity(id) {
     var amount by QueuedTransactions.amount
     var accountId by QueuedTransactions.accountId
     var destinationId by QueuedTransactions.destinationId
-    private var createdAt by QueuedTransactions.createdAt
+    var token by QueuedTransactions.token
+    var createdAt by QueuedTransactions.createdAt
 
     fun toString(accountId: Int): String {
-        return "QueuedTransactions($id, $amount, $accountId, $destinationId, $createdAt)"
+        return "QueuedTransactions($id, $amount, $accountId, $destinationId, $createdAt, $token)"
     }
 
-    fun toQueuedTransactionResponse() = QueuedTransactionResponse(id.value, amount, accountId.value, destinationId.value, createdAt.toString())
+    private fun expiredAt(): DateTime = createdAt.plus(TransactionConstants.EXPIRED_INTERVAL.toMillis())
+
+    fun toQueuedTransactionResponse() =
+        QueuedTransactionResponse(
+            id.value,
+            amount,
+            accountId.value,
+            destinationId.value,
+            createdAt.toString(),
+            expiredAt().toString()
+        )
 }
 
 // JSON Object DTO
@@ -38,11 +52,15 @@ data class QueuedTransactionResponse(
     val amount: Int,
     val account: Int,
     val destination: Int,
-    val createdAt: String
-)
+    val createdAt: String,
+    val expiredAt: String
+) {
+    fun toQueuedTransactionIdResponseWithToken(token: String): QueuedTransactionIdWithToken =
+        QueuedTransactionIdWithToken(id, token)
+}
 
 // JSON Object DTO
 data class QueuedTransactionIdWithToken(
     val id: Int,
-    val token: Int
+    val token: String
 )

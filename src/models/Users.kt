@@ -10,13 +10,10 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
-import totp.TOTPConfig
-import totp.TOTPCredentials
 import totp.TOTPSecretKey
-import javax.crypto.SecretKey
 
 // Table Object
-object Users: IntIdTable() {
+object Users : IntIdTable() {
     val email = varchar("email", 128).uniqueIndex()
     val password = varchar("password", 60)
     val registeredAt = datetime("registered_at").defaultExpression(CurrentDateTime())
@@ -24,11 +21,10 @@ object Users: IntIdTable() {
     val accountId = reference("account_id", Accounts, ReferenceOption.CASCADE)
     val secretKey = varchar("secret_key", 128)
     val phonePublicKey = varchar("phone_public_key", 128).nullable()
-    val phoneMACAddress = varchar("phone_mac_address", 128).nullable()
 }
 
 // Database Object DAO
-class UserEntity(id: EntityID<Int>): IntEntity(id) {
+class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<UserEntity>(Users) {
         fun create(email: String, password: String, secretKey: String): UserEntity {
             return new {
@@ -49,11 +45,20 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     var enabled2FA by Users.enabled2FA
     var secretKey by Users.secretKey
     var phonePublicKey by Users.phonePublicKey
-    var phoneMACAddress by Users.phoneMACAddress
 
-    override fun toString(): String = "User($id, $email, $password, $registeredAt, $enabled2FA, ${account.toAccountResponse()}, $phonePublicKey, $phoneMACAddress)"
+    override fun toString(): String =
+        "User($id, $email, $password, $registeredAt, $enabled2FA, ${account.toAccountResponse()}, $phonePublicKey)"
 
-    fun toUser() = User(id.value, email, password, registeredAt.toString(), enabled2FA, account.toAccountResponse(), secretKey)
+    fun toUser() = User(
+        id.value,
+        email,
+        password,
+        registeredAt.toString(),
+        enabled2FA,
+        account.toAccountResponse(),
+        secretKey,
+        phonePublicKey
+    )
 }
 
 data class User(
@@ -63,10 +68,10 @@ data class User(
     val registeredAt: String? = null,
     val enabled2FA: Boolean = false,
     val account: AccountResponse? = null,
-    val secretKey: String
-
+    val secretKey: String,
+    val phonePublicKey: String? = null
 ) {
-    fun toSimpleUserResponse() = SimpleUserResponse(id!!, email, registeredAt!!, enabled2FA, account!!.id)
+    fun toSimpleUserResponse() = SimpleUserResponse(id!!, email, registeredAt!!, enabled2FA, account!!.id, phonePublicKey)
     fun toUserResponseWithToken() = UserResponseWithJWT(toSimpleUserResponse())
     fun toUserResponseWith2FAToken() = UserResponseWith2FAJWT(toSimpleUserResponse())
 
@@ -79,7 +84,8 @@ data class SimpleUserResponse(
     val email: String,
     val registeredAt: String,
     val enabled2FA: Boolean,
-    val accountId: Int
+    val accountId: Int,
+    val phonePublicKey: String? = null
 )
 
 // JSON Object DTO

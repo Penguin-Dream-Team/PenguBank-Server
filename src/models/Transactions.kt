@@ -7,6 +7,12 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
+import org.joda.time.DateTime
+import java.time.Duration
+
+object TransactionConstants {
+    val EXPIRED_INTERVAL = Duration.ofHours(24)
+}
 
 // Table Object
 object Transactions : IntIdTable() {
@@ -32,8 +38,15 @@ class TransactionEntity(id: EntityID<Int>) : IntEntity(id) {
         return "Transaction($id, $amount, ${getType(accountId)}, ${getOther(accountId)}, $createdAt)"
     }
 
-    fun toTransactionResponse(accountId: Int): TransactionResponse =
-        TransactionResponse(id.value, amount, getType(accountId).toString(), getOther(accountId), createdAt.toString())
+    fun toTransactionResponse(): TransactionResponse =
+        TransactionResponse(
+            id.value,
+            amount,
+            getType(accountId.value).toString(),
+            getOther(accountId.value),
+            createdAt.toString()
+        )
+
 
     private fun getOther(accountId: Int) =
         if (destination.id.value == accountId) account.getUserEmail()
@@ -52,7 +65,7 @@ data class TransactionResponse(
     val createdAt: String
 )
 
-enum class TransactionType(val type: String) {
+enum class TransactionType(private val type: String) {
     RECEIVED("RECEIVED"),
     SENT("SENT");
 

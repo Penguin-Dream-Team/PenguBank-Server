@@ -1,27 +1,53 @@
 package repositories
 
-import models.Accounts
-import models.QueuedTransactionEntity
-import models.TransactionEntity
+import models.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.joda.time.DateTime
 import responses.exceptions.transaction.TransactionNotFoundException
+import java.time.Duration
 
-class QueuedTransactionRepository {
+class QueuedTransactionRepository(
+    private val accountRepository: AccountRepository,
+    private val transactionRepository: TransactionRepository
+) {
 
-    fun addTransaction(accountId: Int, destinationId: Int, amount: Int) = transaction {
+    fun addTransaction(accountId: Int, destinationId: Int, amount: Int, token: String) = transaction {
+        accountRepository.removeBalance(accountId, amount)
+        val destination = accountRepository.getAccount(destinationId)
+
         QueuedTransactionEntity.new {
             this.amount = amount
             this.accountId = EntityID(accountId, Accounts)
-            this.destinationId = EntityID(destinationId, Accounts)
+            this.destinationId = destination.id
+            this.token = token
         }.toQueuedTransactionResponse()
     }
 
-    fun getTransaction(transactionId: Int) = transaction {
-        QueuedTransactionEntity.findById(transactionId) ?: throw TransactionNotFoundException(transactionId)
+    private fun getQueuedTransaction(queuedTransactionId: Int) = transaction {
+        QueuedTransactionEntity.findById(queuedTransactionId) ?: throw TransactionNotFoundException(queuedTransactionId)
     }
 
-    fun deleteTransaction(transactionId: Int) = transaction {
-        getTransaction(transactionId).delete()
+    fun approveTransaction(queuedTransactionId: Int): TransactionResponse = transaction {
+        val queuedTransaction = getQueuedTransaction(queuedTransactionId)
+        transactionRepository.approveTransaction(queuedTransaction)
+    }
+
+    fun cancelTransaction(queuedTransactionId: Int) = cancelTransaction(getQueuedTransaction(queuedTransactionId))
+
+    private fun cancelTransaction(queuedTransaction: QueuedTransactionEntity) = transaction {
+        accountRepository.addBalance(queuedTransaction.accountId.value, queuedTransaction.amount)
+
+        queuedTransaction.delete()
+    }
+
+    fun cancelExpiredTransactions(expiredInterval: Duration) = transaction {
+        QueuedTransactionEntity.find {
+            QueuedTransactions.createdAt.less(DateTime.now().minus(expiredInterval.toMillis()))
+        }.forEach(this@QueuedTransactionRepository::cancelTransaction)
+    }
+
+    fun getToken(transactionId: Int): String = transaction {
+        getQueuedTransaction(transactionId).token
     }
 }

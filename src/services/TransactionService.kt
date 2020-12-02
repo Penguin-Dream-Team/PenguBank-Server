@@ -1,36 +1,50 @@
 package services
 
-import models.*
-import repositories.TransactionRepository
+import club.pengubank.responses.exceptions.transaction.CannotSendTransactionToSelfException
+import club.pengubank.responses.exceptions.transaction.TransactionTokenInvalidException
+import models.QueuedTransactionIdWithToken
+import models.TransactionConstants
+import models.TransactionResponse
 import repositories.QueuedTransactionRepository
-import responses.exceptions.account.AccountNotEnoughBalanceException
+import repositories.TransactionRepository
 
 class TransactionService(
-    private  val transactionRepository: TransactionRepository,
-    private  val queuedTransactionRepository: QueuedTransactionRepository
-)
-{
-    fun getAllTransactions(accountId: Int): Iterable<TransactionResponse> = transactionRepository.getAllTransactions(accountId)
+    private val transactionRepository: TransactionRepository,
+    private val queuedTransactionRepository: QueuedTransactionRepository
+) {
+    fun getAllTransactions(accountId: Int): Iterable<TransactionResponse> =
+        transactionRepository.getAllTransactions(accountId)
 
-    fun getTransactionById(transactionId: Int): TransactionEntity = transactionRepository.getTransaction(transactionId)
-
-    fun getAccountTransactions(accountId: Int): Iterable<TransactionEntity> = transactionRepository.getAccountTransactions(accountId)
-
-    fun newTransaction(account: AccountResponse, destination: Int, amount: Int): QueuedTransactionIdWithToken {
-        if (account.balance < amount) {
-            throw AccountNotEnoughBalanceException(account.id)
-        }
+    fun newTransaction(account: Int, destination: Int, amount: Int): QueuedTransactionIdWithToken {
+        if (account == destination) throw CannotSendTransactionToSelfException()
 
         // Generate Token
-        val token = 3
+        val token = "123"
 
-        return QueuedTransactionIdWithToken(queuedTransactionRepository.addTransaction(account.id, destination, amount).id, token)
+        return queuedTransactionRepository.addTransaction(
+            account,
+            destination,
+            amount,
+            token
+        ).toQueuedTransactionIdResponseWithToken(token)
     }
 
-    fun endQueuedTransaction(transactionId: Int): TransactionResponse {
-        val queuedTransaction = queuedTransactionRepository.getTransaction(transactionId)
-        queuedTransactionRepository.deleteTransaction(transactionId)
-
-        return transactionRepository.addTransaction(queuedTransaction.accountId.value, queuedTransaction.destinationId.value, queuedTransaction.amount)
+    fun cancelTransaction(transactionId: Int, signedToken: String) {
+        validateTransactionToken(transactionId, signedToken)
+        queuedTransactionRepository.cancelTransaction(transactionId)
     }
+
+    fun approveTransaction(transactionId: Int, signedToken: String): TransactionResponse {
+        validateTransactionToken(transactionId, signedToken)
+        return queuedTransactionRepository.approveTransaction(transactionId)
+    }
+
+    private fun validateTransactionToken(transactionId: Int, signedToken: String) {
+        val token = queuedTransactionRepository.getToken(transactionId)
+
+        if (token != signedToken) throw TransactionTokenInvalidException()
+    }
+
+    fun performExpiredTransactionsCronJob() =
+        queuedTransactionRepository.cancelExpiredTransactions(TransactionConstants.EXPIRED_INTERVAL)
 }

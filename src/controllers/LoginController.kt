@@ -56,7 +56,7 @@ fun Route.login() {
 
             withContext(Dispatchers.IO) {
                 val setupValues = call.receive<SetupRequest>()
-                userService.setupPhone(loggedUser.user, setupValues.phoneMACAddress, setupValues.phonePublicKey)
+                userService.setupPhone(loggedUser.user, setupValues.phonePublicKey)
 
                 call.respond(SuccessResponse(data = loggedUser))
             }
@@ -78,5 +78,5 @@ fun Route.login() {
 
 data class RegisterRequest(val email: String, val password: String, val confirmPassword: String)
 data class LoginRequest(val email: String, val password: String)
-data class SetupRequest(val phonePublicKey: String, val phoneMACAddress: String)
+data class SetupRequest(val phonePublicKey: String)
 data class Verify2FARequest(val code: Int?)

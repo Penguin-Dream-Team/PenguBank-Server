@@ -13,8 +13,6 @@ import io.ktor.auth.jwt.*
 import org.springframework.security.crypto.bcrypt.BCrypt
 import repositories.UserRepository
 import totp.TOTPAuthenticator
-import totp.TOTPSecretKey
-import java.time.Instant
 
 class AuthService(private val userRepository: UserRepository) {
 
@@ -36,7 +34,11 @@ class AuthService(private val userRepository: UserRepository) {
 
         val secretKey = TOTPAuthenticator().createSecretKey()
 
-        return userRepository.addUser(User(email = registerValues.email, password = cipheredPassword, secretKey = secretKey.toString()))
+        return userRepository.addUser(User(
+            email = registerValues.email,
+            password = cipheredPassword,
+            secretKey = secretKey.toString()
+        ))
     }
 
     fun verify2FA(userId: Int, verifyValues: Verify2FARequest) {

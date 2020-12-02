@@ -1,13 +1,10 @@
 package controllers
 
-import application.Accounts
-import application.Transaction
-import application.guest
-import application.user
+import application.*
 import io.ktor.application.*
 import io.ktor.auth.authenticate
 import io.ktor.locations.*
-import io.ktor.request.receive
+import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
@@ -15,46 +12,50 @@ import kotlinx.coroutines.withContext
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
 import responses.SuccessResponse
-import services.AccountService
 import services.TransactionService
 import services.UserService
 
 @KtorExperimentalLocationsAPI
 fun Route.accounts() {
-    val accountService by di().instance<AccountService>()
     val transactionService by di().instance<TransactionService>()
     val userService by di().instance<UserService>()
 
-    get<Accounts> {
-        call.respond(accountService.getAllAccounts())
-    }
-
     authenticate("password-2fauth") {
         put<Transaction> {
+            val userWithToken = call.user!!
+
             withContext(Dispatchers.IO) {
                 val transactionValues = call.receive<TransactionRequest>()
-                val userWithToken = call.user!!
                 val user = userService.getUserById(userWithToken.user.id)
 
-                val queuedTransactionResponse = transactionService.newTransaction(user.account!!, transactionValues.accountDestinationId, transactionValues.amount)
+                val queuedTransactionResponse = transactionService.newTransaction(user.account!!.id, transactionValues.destinationId, transactionValues.amount)
                 call.respond(SuccessResponse(data = queuedTransactionResponse, token = userWithToken.token))
             }
         }
 
-        put<Transaction> {
+        delete<CancelTransaction> {
+            val userWithToken = call.user!!
+
             withContext(Dispatchers.IO) {
-                val transactionValues = call.receive<EndTransactionRequest>()
-                // if not signed return error
+                val cancelRequest = call.receive<CancelTransactionRequest>()
+                transactionService.cancelTransaction(cancelRequest.transactionId, cancelRequest.signedToken)
+                call.respond(SuccessResponse(data = mapOf("ok" to true), token = userWithToken.token))
+            }
+        }
 
-                val userWithToken = call.user!!
+        patch<ApproveTransaction> {
+            val userWithToken = call.user!!
 
-                val transactionResponse = transactionService.endQueuedTransaction(transactionValues.transactionId)
+            withContext(Dispatchers.IO) {
+                val approveRequest = call.receive<ApproveTransactionRequest>()
+                val transactionResponse = transactionService.approveTransaction(approveRequest.transactionId, approveRequest.signedToken)
                 call.respond(SuccessResponse(data = transactionResponse, token = userWithToken.token))
             }
         }
     }
 }
 
-data class TransactionRequest(val accountDestinationId: Int, val amount: Int)
-data class EndTransactionRequest(val transactionId: Int, val signedToken: Int)
+data class TransactionRequest(val destinationId: Int, val amount: Int)
+data class ApproveTransactionRequest(val transactionId: Int, val signedToken: String)
+data class CancelTransactionRequest(val transactionId: Int, val signedToken: String)
 

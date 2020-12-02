@@ -1,38 +1,32 @@
 package repositories
 
-import responses.exceptions.transaction.AccountTransactionsNotFoundException
-import responses.exceptions.transaction.TransactionNotFoundException
-import models.*
-import org.jetbrains.exposed.dao.id.EntityID
+import models.QueuedTransactionEntity
+import models.TransactionEntity
+import models.TransactionResponse
+import models.Transactions
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class TransactionRepository {
+class TransactionRepository(private val accountRepository: AccountRepository) {
 
     fun getAllTransactions(accountId: Int): Iterable<TransactionResponse> = transaction {
-        TransactionEntity.all().map { it.toTransactionResponse(accountId) }
+        TransactionEntity.find { Transactions.accountId.eq(accountId) or Transactions.destinationId.eq(accountId) }
+            .map(TransactionEntity::toTransactionResponse)
     }
 
-    fun getTransaction(transactionId: Int) = transaction {
-        TransactionEntity.findById(transactionId) ?: throw TransactionNotFoundException(transactionId)
-    }
+    fun approveTransaction(queuedTransaction: QueuedTransactionEntity): TransactionResponse = transaction {
 
-    // Isto precisa de execao??
-    fun getAccountTransactions(accountId: Int) = transaction {
-        TransactionEntity.find {Transactions.accountId eq accountId}.asIterable() ?: throw  AccountTransactionsNotFoundException(accountId)
-    }
+        val transaction = TransactionEntity.new {
+            this.amount = queuedTransaction.amount
+            this.accountId = queuedTransaction.accountId
+            this.destinationId = queuedTransaction.destinationId
+            this.createdAt = queuedTransaction.createdAt
+        }
 
-    fun addTransaction(accountId: Int, destinationId: Int, amount: Int) = transaction {
-        AccountEntity[accountId].balance -= amount
-        AccountEntity[destinationId].balance += amount
+        queuedTransaction.delete()
 
-        TransactionEntity.new {
-            this.amount = amount
-            this.accountId = EntityID(accountId, Accounts)
-            this.destinationId = EntityID(destinationId, Accounts)
-        }.toTransactionResponse(accountId)
-    }
+        accountRepository.addBalance(transaction.destinationId.value, transaction.amount)
 
-    fun deleteTransaction(transactionId: Int) = transaction {
-        getTransaction(transactionId).delete()
+        transaction.toTransactionResponse()
     }
 }
