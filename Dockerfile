@@ -27,7 +27,8 @@ USER $APPLICATION_USER
 
 # Copying needed files
 COPY --from=build /appbuild/build/libs/pengubank-server*all.jar /app/PenguBank-Server.jar
-COPY --from=build /appbuild/resources/ /app/resources/
+COPY --from=build /appbuild/resources/application.conf /app/resources/application.conf
+COPY --from=build /appbuild/resources/dbconfig.deploy.properties /app/resources/dbconfig.properties
 COPY --from=build /appbuild/resources/logback.deploy.xml /app/resources/logback.xml
 WORKDIR /app
 
