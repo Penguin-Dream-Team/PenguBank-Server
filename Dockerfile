@@ -26,7 +26,7 @@ RUN chmod -R 755 /app
 USER $APPLICATION_USER
 
 # Copying needed files
-COPY --from=build /appbuild/build/libs/PenguBank-Server*all.jar /app/PenguBank-Server.jar
+COPY --from=build /appbuild/build/libs/pengubank-server*all.jar /app/PenguBank-Server.jar
 COPY --from=build /appbuild/resources/ /app/resources/
 COPY --from=build /appbuild/resources/logback.deploy.xml /app/resources/logback.xml
 WORKDIR /app
