@@ -5,11 +5,13 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
     }
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'club.pengubank'
 version '0.1.5'
@@ -23,6 +25,12 @@ task copyResources {
         }
         into("${rootProject.buildDir}/install/${project.name}/resources")
         rename("logback.deploy.xml", "logback.xml")
+    }
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': mainClassName
     }
 }
 
