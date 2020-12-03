@@ -1,4 +1,4 @@
-package club.pengubank.responses.exceptions.transaction
+package responses.exceptions.transaction
 
 import responses.exceptions.BadRequestException
 

@@ -1,6 +1,8 @@
 package repositories
 
-import models.*
+import models.User
+import models.UserEntity
+import models.Users
 import responses.exceptions.user.UserNotFoundException
 import responses.exceptions.user.UserWrongEmailException
 import org.jetbrains.exposed.sql.transactions.transaction

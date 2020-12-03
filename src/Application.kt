@@ -1,5 +1,3 @@
-package club.pengubank
-
 import application.bindServices
 import application.initDatabase
 import application.installFeatures

@@ -1,6 +1,6 @@
 package services
 
-import club.pengubank.responses.exceptions.user.UserPhoneAlreadyRegisteredException
+import responses.exceptions.user.UserPhoneAlreadyRegisteredException
 import models.SimpleUserResponse
 import models.User
 import repositories.UserRepository

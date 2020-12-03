@@ -243,5 +243,6 @@ class TOTPAuthenticator() {
         private const val HMAC_HASH_FUNCTION = "HmacSHA1"
     }
 
-    fun createQRCode(issuer: String?, accountName: String, secretKey: TOTPSecretKey) = QRCodeFactory.createQRCodeURL(issuer, accountName, secretKey)
+    fun createQRCode(issuer: String?, accountName: String, secretKey: TOTPSecretKey) =
+        QRCodeFactory.createQRCodeURL(issuer, accountName, secretKey)
 }

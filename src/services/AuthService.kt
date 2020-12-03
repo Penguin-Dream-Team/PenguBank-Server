@@ -7,9 +7,12 @@ import responses.exceptions.user.UserInvalid2FACodeException
 import responses.exceptions.user.UserRegistrationDuplicateEmailException
 import responses.exceptions.user.UserRegistrationPasswordsDoNotMatch
 import responses.exceptions.user.UserWrongCredentialsException
-import models.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
+import models.SimpleUserResponse
+import models.User
+import models.UserResponseWith2FAJWT
+import models.UserResponseWithJWT
 import org.springframework.security.crypto.bcrypt.BCrypt
 import repositories.UserRepository
 import totp.TOTPAuthenticator
@@ -34,11 +37,13 @@ class AuthService(private val userRepository: UserRepository) {
 
         val secretKey = TOTPAuthenticator().createSecretKey()
 
-        return userRepository.addUser(User(
+        return userRepository.addUser(
+            User(
             email = registerValues.email,
             password = cipheredPassword,
             secretKey = secretKey.toString()
-        ))
+        )
+        )
     }
 
     fun verify2FA(userId: Int, verifyValues: Verify2FARequest) {

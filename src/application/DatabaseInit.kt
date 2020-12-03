@@ -4,6 +4,10 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
 import io.ktor.util.*
+import models.Accounts
+import models.QueuedTransactions
+import models.Transactions
+import models.Users
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -24,10 +28,10 @@ fun Application.initDatabase() {
 
 private fun createTables() = transaction {
     SchemaUtils.create(
-        models.Users,
-        models.Accounts,
-        models.Transactions,
-        models.QueuedTransactions
+        Users,
+        Accounts,
+        Transactions,
+        QueuedTransactions
     )
 }
 

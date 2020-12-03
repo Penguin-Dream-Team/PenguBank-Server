@@ -15,9 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
-import responses.ErrorResponse
 import services.UserService
-import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ErrorReporter
 
 @KtorExperimentalLocationsAPI
 fun Route.login() {

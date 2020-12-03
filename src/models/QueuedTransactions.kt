@@ -8,7 +8,6 @@ import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
 import org.joda.time.DateTime
-import org.springframework.security.crypto.keygen.KeyGenerators.string
 
 // Table Object
 object QueuedTransactions : IntIdTable() {

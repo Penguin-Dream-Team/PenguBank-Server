@@ -1,4 +1,4 @@
-package club.pengubank.responses.exceptions.user
+package responses.exceptions.user
 
 import responses.exceptions.NotFoundException
 

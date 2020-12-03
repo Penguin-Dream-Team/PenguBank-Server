@@ -1,7 +1,7 @@
 package services
 
-import club.pengubank.responses.exceptions.transaction.CannotSendTransactionToSelfException
-import club.pengubank.responses.exceptions.transaction.TransactionTokenInvalidException
+import responses.exceptions.transaction.CannotSendTransactionToSelfException
+import responses.exceptions.transaction.TransactionTokenInvalidException
 import models.QueuedTransactionIdWithToken
 import models.TransactionConstants
 import models.TransactionResponse

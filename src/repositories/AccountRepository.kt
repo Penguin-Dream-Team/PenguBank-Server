@@ -1,9 +1,10 @@
 package repositories
 
 import responses.exceptions.account.AccountNotFoundException
-import models.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import responses.exceptions.account.AccountNotEnoughBalanceException
+import models.AccountEntity
+import models.AccountResponse
 
 class AccountRepository {
 
