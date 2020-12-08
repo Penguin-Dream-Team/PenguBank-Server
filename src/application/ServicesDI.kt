@@ -22,5 +22,5 @@ fun DI.MainBuilder.bindServices() {
     bind<AuthService>() with singleton { AuthService(userRepository) }
     bind<UserService>() with singleton { UserService(userRepository) }
     bind<AccountService>() with singleton { AccountService(accountRepository) }
-    bind<TransactionService>() with singleton { TransactionService(transactionRepository, queuedTransactionRepository) }
+    bind<TransactionService>() with singleton { TransactionService(userRepository, queuedTransactionRepository) }
 }

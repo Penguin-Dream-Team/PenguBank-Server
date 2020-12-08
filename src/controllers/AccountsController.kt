@@ -38,7 +38,7 @@ fun Route.accounts() {
 
             withContext(Dispatchers.IO) {
                 val cancelRequest = call.receive<CancelTransactionRequest>()
-                transactionService.cancelTransaction(cancelRequest.transactionId, cancelRequest.signedToken)
+                transactionService.cancelTransaction(userWithToken.user.id, cancelRequest.transactionId, cancelRequest.signedToken)
                 call.respond(SuccessResponse(data = mapOf("ok" to true), token = userWithToken.token))
             }
         }
@@ -48,7 +48,7 @@ fun Route.accounts() {
 
             withContext(Dispatchers.IO) {
                 val approveRequest = call.receive<ApproveTransactionRequest>()
-                val transactionResponse = transactionService.approveTransaction(approveRequest.transactionId, approveRequest.signedToken)
+                val transactionResponse = transactionService.approveTransaction(userWithToken.user.id, approveRequest.transactionId, approveRequest.signedToken)
                 call.respond(SuccessResponse(data = transactionResponse, token = userWithToken.token))
             }
         }
