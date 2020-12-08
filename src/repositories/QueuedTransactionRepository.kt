@@ -54,4 +54,10 @@ class QueuedTransactionRepository(
     fun getToken(transactionId: Int): String = transaction {
         getQueuedTransaction(transactionId).token
     }
+
+    fun getAllQueuedTransactions(accountId: Int): Iterable<QueuedTransactionResponse> = transaction {
+        QueuedTransactionEntity.find { QueuedTransactions.accountId.eq(accountId) }
+            .map(QueuedTransactionEntity::toQueuedTransactionResponse)
+    }
+
 }

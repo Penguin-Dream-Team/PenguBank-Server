@@ -41,7 +41,8 @@ class QueuedTransactionEntity(id: EntityID<Int>) : IntEntity(id) {
             accountId.value,
             destinationId.value,
             createdAt.toString(),
-            expiredAt().toString()
+            expiredAt().toString(),
+            token
         )
 }
 
@@ -52,14 +53,6 @@ data class QueuedTransactionResponse(
     val account: Int,
     val destination: Int,
     val createdAt: String,
-    val expiredAt: String
-) {
-    fun toQueuedTransactionIdResponseWithToken(token: String): QueuedTransactionIdWithToken =
-        QueuedTransactionIdWithToken(id, token)
-}
-
-// JSON Object DTO
-data class QueuedTransactionIdWithToken(
-    val id: Int,
+    val expiredAt: String,
     val token: String
 )

@@ -1,9 +1,6 @@
 package controllers
 
-import application.ApproveTransaction
-import application.CancelTransaction
-import application.Transaction
-import application.user
+import application.*
 import io.ktor.application.*
 import io.ktor.auth.authenticate
 import io.ktor.locations.*
@@ -52,6 +49,15 @@ fun Route.accounts() {
             withContext(Dispatchers.IO) {
                 val approveRequest = call.receive<ApproveTransactionRequest>()
                 val transactionResponse = transactionService.approveTransaction(approveRequest.transactionId, approveRequest.signedToken)
+                call.respond(SuccessResponse(data = transactionResponse, token = userWithToken.token))
+            }
+        }
+
+        get<PendingTransactions> {
+            val userWithToken = call.user!!
+
+            withContext(Dispatchers.IO) {
+                val transactionResponse = transactionService.getAllPendingTransactions(userWithToken.user.accountId)
                 call.respond(SuccessResponse(data = transactionResponse, token = userWithToken.token))
             }
         }

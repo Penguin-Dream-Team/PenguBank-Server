@@ -54,6 +54,10 @@ class CancelTransaction
 @Location("/dashboard/myphonekey")
 class UserMobileKey
 
+@KtorExperimentalLocationsAPI
+@Location("/transactions/pending")
+class PendingTransactions
+
 /*
     - Home => optional
 
