@@ -43,7 +43,7 @@ fun Route.accounts() {
             }
         }
 
-        patch<ApproveTransaction> {
+        put<ApproveTransaction> {
             val userWithToken = call.user!!
 
             withContext(Dispatchers.IO) {
