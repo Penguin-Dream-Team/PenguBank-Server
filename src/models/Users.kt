@@ -10,6 +10,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.jodatime.CurrentDateTime
 import org.jetbrains.exposed.sql.jodatime.datetime
+import responses.exceptions.user.UserPhoneNotYetRegisteredException
 import totp.TOTPSecretKey
 
 // Table Object
@@ -76,6 +77,9 @@ data class User(
     fun toUserResponseWith2FAToken() = UserResponseWith2FAJWT(toSimpleUserResponse())
 
     fun getSecretKey(): TOTPSecretKey = TOTPSecretKey.from(value = secretKey)
+    fun checkIfHasPhoneKey() {
+        if (phonePublicKey.isNullOrBlank()) throw UserPhoneNotYetRegisteredException()
+    }
 }
 
 // JSON Object DTO

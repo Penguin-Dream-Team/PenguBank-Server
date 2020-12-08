@@ -1,5 +1,5 @@
 package responses.exceptions.user
 
-import responses.exceptions.NotFoundException
+import responses.exceptions.DuplicateException
 
-class UserPhoneAlreadyRegisteredException : NotFoundException("This account has already registered a phone")
+class UserPhoneAlreadyRegisteredException : DuplicateException("This account has already registered a phone")

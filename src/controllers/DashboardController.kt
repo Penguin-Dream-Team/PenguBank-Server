@@ -40,6 +40,7 @@ fun Route.dashboard() {
             withContext(Dispatchers.IO) {
                 val userWithToken = call.user!!
                 val user = userService.getUserById(userWithToken.user.id)
+                user.checkIfHasPhoneKey()
                 call.respond(
                     SuccessResponse(
                         data = mapOf("phonePublicKey" to user.phonePublicKey),
