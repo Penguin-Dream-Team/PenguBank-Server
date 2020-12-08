@@ -2,6 +2,7 @@ package controllers
 
 import application.Dashboard
 import application.Activate2FA
+import application.UserMobileKey
 import application.user
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -35,6 +36,19 @@ fun Route.dashboard() {
             }
         }
 
+        get<UserMobileKey> {
+            withContext(Dispatchers.IO) {
+                val userWithToken = call.user!!
+                val user = userService.getUserById(userWithToken.user.id)
+                call.respond(
+                    SuccessResponse(
+                        data = mapOf("phonePublicKey" to user.phonePublicKey),
+                        token = userWithToken.token
+                    )
+                )
+            }
+        }
+
         location<Activate2FA> {
             post {
                 withContext(Dispatchers.IO) {
@@ -58,7 +72,12 @@ fun Route.dashboard() {
                     val newUser = userService.activate2FA(user.id)
 
                     val userResponseWithToken = newUser.toUserResponseWith2FAToken()
-                    call.respond(SuccessResponse(data = userResponseWithToken.user, token = userResponseWithToken.token))
+                    call.respond(
+                        SuccessResponse(
+                            data = userResponseWithToken.user,
+                            token = userResponseWithToken.token
+                        )
+                    )
                 }
             }
         }

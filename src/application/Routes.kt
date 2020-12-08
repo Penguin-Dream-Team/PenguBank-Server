@@ -50,6 +50,10 @@ class ApproveTransaction
 @Location("/transaction/cancel")
 class CancelTransaction
 
+@KtorExperimentalLocationsAPI
+@Location("/dashboard/myphonekey")
+class UserMobileKey
+
 /*
     - Home => optional
 
