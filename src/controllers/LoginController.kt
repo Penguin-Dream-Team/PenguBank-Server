@@ -48,7 +48,7 @@ fun Route.login() {
         }
     }
 
-    authenticate("password-2fauth") {
+    authenticate("password-auth", "password-2fauth") {
         post<SetupPhone> {
             val loggedUser = call.user!!
 
