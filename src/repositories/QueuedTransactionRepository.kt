@@ -16,14 +16,13 @@ class QueuedTransactionRepository(
     private val transactionRepository: TransactionRepository
 ) {
 
-    fun addTransaction(accountId: Int, destinationId: Int, amount: Int, token: String) = transaction {
+    fun addTransaction(accountId: Int, destination: AccountEntity, amount: Int, token: String) = transaction {
         accountRepository.removeBalance(accountId, amount)
-        val destination = accountRepository.getAccount(destinationId)
 
         QueuedTransactionEntity.new {
             this.amount = amount
-            this.accountId = EntityID(accountId, Accounts)
-            this.destinationId = destination.id
+            this.account = AccountEntity[accountId]
+            this.destination = destination
             this.token = token
         }.toQueuedTransactionResponse()
     }
@@ -40,7 +39,7 @@ class QueuedTransactionRepository(
     fun cancelTransaction(queuedTransactionId: Int) = cancelTransaction(getQueuedTransaction(queuedTransactionId))
 
     private fun cancelTransaction(queuedTransaction: QueuedTransactionEntity) = transaction {
-        accountRepository.addBalance(queuedTransaction.accountId.value, queuedTransaction.amount)
+        accountRepository.addBalance(queuedTransaction.account.id.value, queuedTransaction.amount)
 
         queuedTransaction.delete()
     }

@@ -30,7 +30,7 @@ class AccountEntity(id: EntityID<Int>) : IntEntity(id) {
         (sentTransactions + receivedTransactions).sortedBy(TransactionEntity::createdAt)
 
     private fun transactionsMap(): List<TransactionResponse> = transaction {
-        transactions.map { it.toTransactionResponse() }
+        transactions.map { it.toTransactionResponse(this@AccountEntity.id.value) }
     }
 
     private fun queuedTransactionsMap(): List<QueuedTransactionResponse> = transaction {

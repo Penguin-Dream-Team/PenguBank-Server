@@ -39,10 +39,10 @@ class AuthService(private val userRepository: UserRepository) {
 
         return userRepository.addUser(
             User(
-            email = registerValues.email,
-            password = cipheredPassword,
-            secretKey = secretKey.toString()
-        )
+                email = registerValues.email,
+                password = cipheredPassword,
+                secretKey = secretKey.toString()
+            )
         )
     }
 
@@ -50,7 +50,7 @@ class AuthService(private val userRepository: UserRepository) {
         verifyValues.code ?: throw UserInvalid2FACodeException()
         val secretKey = userRepository.getUser(userId).getSecretKey()
 
-        if(!TOTPAuthenticator().authorize(secretKey, verifyValues.code))
+        if (!TOTPAuthenticator().authorize(secretKey, verifyValues.code))
             throw UserInvalid2FACodeException()
     }
 

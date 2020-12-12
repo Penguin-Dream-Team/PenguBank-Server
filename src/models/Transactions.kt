@@ -37,12 +37,12 @@ class TransactionEntity(id: EntityID<Int>) : IntEntity(id) {
         return "Transaction($id, $amount, ${getType(accountId)}, ${getOther(accountId)}, $createdAt)"
     }
 
-    fun toTransactionResponse(): TransactionResponse =
+    fun toTransactionResponse(accountId: Int): TransactionResponse =
         TransactionResponse(
             id.value,
             amount,
-            getType(accountId.value).toString(),
-            getOther(accountId.value),
+            getType(accountId).toString(),
+            getOther(accountId),
             createdAt.toString()
         )
 
@@ -51,7 +51,7 @@ class TransactionEntity(id: EntityID<Int>) : IntEntity(id) {
         if (destination.id.value == accountId) account.getUserEmail()
         else destination.getUserEmail()
 
-    private fun getType(accountId: Int) =
+    private fun getType(accountId: Int): TransactionType =
         if (destination.id.value == accountId) TransactionType.RECEIVED else TransactionType.SENT
 }
 

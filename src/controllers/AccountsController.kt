@@ -28,7 +28,7 @@ fun Route.accounts() {
                 val transactionValues = call.receive<TransactionRequest>()
                 val user = userService.getUserById(userWithToken.user.id)
 
-                val queuedTransactionResponse = transactionService.newTransaction(user.account!!.id, transactionValues.destinationId, transactionValues.amount)
+                val queuedTransactionResponse = transactionService.newTransaction(user.account!!.id, transactionValues.destinationEmail, transactionValues.amount)
                 call.respond(SuccessResponse(data = queuedTransactionResponse, token = userWithToken.token))
             }
         }
@@ -64,7 +64,7 @@ fun Route.accounts() {
     }
 }
 
-data class TransactionRequest(val destinationId: Int, val amount: Int)
+data class TransactionRequest(val destinationEmail: String, val amount: Int)
 data class ApproveTransactionRequest(val transactionId: Int, val signedToken: String)
 data class CancelTransactionRequest(val transactionId: Int, val signedToken: String)
 

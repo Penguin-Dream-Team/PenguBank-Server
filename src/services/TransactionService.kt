@@ -1,5 +1,6 @@
 package services
 
+import models.AccountEntity
 import models.QueuedTransactionResponse
 import models.TransactionConstants
 import models.TransactionResponse
@@ -7,10 +8,10 @@ import org.apache.commons.codec.binary.Base64
 import repositories.QueuedTransactionRepository
 import repositories.UserRepository
 import responses.exceptions.transaction.CannotSendTransactionToSelfException
+import responses.exceptions.transaction.InvalidTransactionAmountException
 import responses.exceptions.transaction.TransactionTokenInvalidException
 import responses.exceptions.user.UserPhoneNotYetRegisteredException
-import utils.SecurityUtils
-import java.lang.RuntimeException
+import security.SecurityUtils
 import java.time.Instant
 import java.util.*
 
@@ -22,8 +23,14 @@ class TransactionService(
     fun getAllPendingTransactions(accountId: Int): Iterable<QueuedTransactionResponse> =
         queuedTransactionRepository.getAllQueuedTransactions(accountId)
 
-    fun newTransaction(account: Int, destination: Int, amount: Int): QueuedTransactionResponse {
-        if (account == destination) throw CannotSendTransactionToSelfException()
+    fun newTransaction(account: Int, destinationEmail: String, amount: Int): QueuedTransactionResponse {
+        val destination: AccountEntity = userRepository.getUserAccount(destinationEmail)
+
+        if (destination.id.value == account)
+            throw CannotSendTransactionToSelfException()
+
+        if (amount <= 0)
+            throw InvalidTransactionAmountException()
 
         val token = Base64.encodeBase64String("${UUID.randomUUID()}${Instant.now().toEpochMilli()}".encodeToByteArray())
 

@@ -34,7 +34,6 @@ fun Route.login() {
 
     post<LoginUser> {
         if (!call.guest) throw UserAlreadyLoggedInException()
-
         withContext(Dispatchers.IO) {
             val loginValues = call.receive<LoginRequest>()
             val loggedUser = authService.login(loginValues.email, loginValues.password)
@@ -43,6 +42,8 @@ fun Route.login() {
                     loggedUser.toUserResponseWithToken().token
                 else
                     loggedUser.toUserResponseWith2FAToken().token
+
+            println(loggedUser.secretKey)
 
             call.respond(SuccessResponse(data = loggedUser.toSimpleUserResponse(), token = token))
         }

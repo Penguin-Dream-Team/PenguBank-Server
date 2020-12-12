@@ -1,5 +1,6 @@
 package repositories
 
+import models.AccountEntity
 import models.User
 import models.UserEntity
 import models.Users
@@ -33,9 +34,7 @@ class UserRepository {
         UserEntity.create(user.email, user.password, user.secretKey).toUser()
     }
 
-    fun hasUser(email: String): Boolean {
-        return getUserOrNull(email) != null
-    }
+    fun hasUser(email: String): Boolean = getUserOrNull(email) != null
 
     fun activate2FA(userId: Int) = transaction {
         getUserOrNull(userId)!!.enabled2FA = true
@@ -45,7 +44,9 @@ class UserRepository {
         getUserOrNull(userId)!!.phonePublicKey = phonePublicKey
     }
 
-    fun hasPhonePublicKey(userId: Int): Boolean {
-        return getUserOrNull(userId)?.phonePublicKey?.isNotBlank() ?: false
+    fun hasPhonePublicKey(userId: Int): Boolean = getUserOrNull(userId)?.phonePublicKey?.isNotBlank() ?: false
+
+    fun getUserAccount(email: String): AccountEntity = transaction {
+        getUserOrNull(email)?.account ?: throw UserWrongEmailException(email)
     }
 }

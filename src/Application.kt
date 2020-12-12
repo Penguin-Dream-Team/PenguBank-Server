@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
 import org.kodein.di.instance
 import org.kodein.di.ktor.di
+import security.SecurityUtils
 import services.TransactionService
 import java.time.Duration
 
@@ -22,6 +23,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 fun Application.module(testing: Boolean = false) {
+
+    SecurityUtils.init()
 
     initDatabase()
 
